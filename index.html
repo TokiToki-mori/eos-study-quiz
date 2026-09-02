@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>EOSボーナスプラン 学習ラボ</title>
+<style>
+:root{
+  --ink:#1a1f3a;
+  --ink-2:#2b3358;
+  --paper:#f7f1e3;
+  --paper-2:#efe7d4;
+  --paper-3:#e8dec6;
+  --gold:#b88a3c;
+  --gold-2:#d4a85a;
+  --gold-soft:#ecd9a9;
+  --rust:#a04825;
+  --navy:#0f1730;
+  --line:#cfc6ad;
+  --line-soft:#e4dcc6;
+  --good:#2f6a4a;
+  --good-bg:#dceadb;
+  --bad:#8a2929;
+  --bad-bg:#ecdad4;
+  --shadow:0 1px 0 rgba(0,0,0,.04), 0 8px 24px -10px rgba(26,31,58,.18);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--paper);color:var(--ink);font-feature-settings:"palt"}
+body{
+  font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP","Hiragino Sans","Yu Gothic","Noto Sans JP",serif;
+  font-size:15px;line-height:1.65;
+  min-height:100vh;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(184,138,60,.15), transparent 60%),
+    repeating-linear-gradient(0deg, transparent, transparent 28px, rgba(184,138,60,.04) 28px, rgba(184,138,60,.04) 29px),
+    var(--paper);
+}
+.shell{max-width:1080px;margin:0 auto;padding:32px 28px 80px}
+
+/* ── Header ── */
+header.hero{
+  border-top:6px double var(--gold);
+  border-bottom:1px solid var(--line);
+  padding:28px 0 22px;
+  margin-bottom:36px;
+  position:relative;
+}
+header.hero::after{
+  content:"";position:absolute;left:0;right:0;top:-2px;height:2px;background:var(--gold);
+}
+.eyebrow{
+  font-family:"Georgia",serif;letter-spacing:.32em;font-size:11px;color:var(--gold);
+  margin-bottom:10px;text-transform:uppercase;
+}
+h1{
+  font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",Georgia,serif;
+  font-weight:700;font-size:34px;letter-spacing:.02em;line-height:1.2;
+  color:var(--navy);
+}
+h1 .accent{color:var(--gold);font-style:italic}
+.subtitle{margin-top:10px;color:var(--ink-2);font-size:14px;max-width:680px}
+.hero-meta{
+  margin-top:18px;display:flex;gap:22px;flex-wrap:wrap;font-size:12px;
+  color:var(--ink-2);font-family:Georgia,serif;letter-spacing:.08em;
+}
+.hero-meta b{color:var(--gold);font-weight:600}
+
+/* ── Mode tabs ── */
+.modes{
+  display:flex;gap:0;border:1px solid var(--line);border-bottom:none;
+  background:var(--paper-2);
+}
+.modes button{
+  flex:1;padding:14px 12px;background:transparent;border:0;border-bottom:1px solid var(--line);
+  font:inherit;color:var(--ink-2);cursor:pointer;letter-spacing:.06em;
+  transition:background .2s, color .2s;
+}
+.modes button:hover{background:rgba(184,138,60,.08);color:var(--ink)}
+.modes button.active{background:var(--paper);color:var(--navy);font-weight:600;border-bottom:3px solid var(--gold)}
+
+/* ── Categories ── */
+.section-title{
+  display:flex;align-items:baseline;gap:14px;margin:36px 0 14px;
+  padding-bottom:8px;border-bottom:1px solid var(--line);
+}
+.section-title .num{
+  font-family:Georgia,serif;font-style:italic;font-weight:400;font-size:18px;color:var(--gold);
+}
+.section-title h2{
+  font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;
+  font-size:20px;font-weight:600;color:var(--navy);letter-spacing:.04em;
+}
+.section-title .count{font-size:12px;color:var(--ink-2);font-family:Georgia,serif;letter-spacing:.08em}
+
+.category-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);
+  border:1px solid var(--line);
+}
+@media(max-width:720px){.category-grid{grid-template-columns:1fr}}
+.cat-card{
+  background:var(--paper-2);padding:24px 22px;cursor:pointer;
+  transition:background .2s, transform .15s;
+  display:flex;flex-direction:column;gap:6px;
+}
+.cat-card:hover{background:var(--paper);transform:translateY(-2px)}
+.cat-card .cat-num{font-family:Georgia,serif;font-style:italic;color:var(--gold);font-size:14px}
+.cat-card .cat-name{font-size:17px;font-weight:600;color:var(--navy)}
+.cat-card .cat-desc{font-size:13px;color:var(--ink-2);line-height:1.5}
+.cat-card .cat-stat{margin-top:auto;font-size:11px;color:var(--gold);letter-spacing:.08em;font-family:Georgia,serif}
+
+/* ── Quiz card ── */
+.quiz-wrap{margin-top:32px}
+.q-card{
+  background:#fffdf6;border:1px solid var(--line);
+  padding:28px 32px 30px;
+  box-shadow:var(--shadow);
+  position:relative;
+}
+.q-card::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),var(--gold-soft),var(--gold));
+}
+.q-meta{
+  display:flex;gap:14px;align-items:center;
+  font-size:11px;letter-spacing:.16em;color:var(--gold);font-family:Georgia,serif;
+  text-transform:uppercase;margin-bottom:16px;
+}
+.q-meta .badge{
+  background:var(--navy);color:var(--paper);padding:3px 8px;font-size:10px;letter-spacing:.14em;
+}
+.q-meta .badge.calc{background:var(--rust)}
+.q-meta .badge.choice{background:var(--gold-2);color:var(--navy)}
+.q-num{font-family:Georgia,serif;font-style:italic;font-size:14px}
+.q-difficulty{
+  display:inline-flex;gap:2px;margin-left:auto;
+}
+.q-difficulty i{
+  display:inline-block;width:8px;height:8px;background:var(--line);border-radius:50%;
+}
+.q-difficulty i.on{background:var(--gold)}
+
+.q-text{
+  font-size:18px;line-height:1.7;color:var(--ink);
+  font-weight:500;margin-bottom:22px;
+  font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;
+}
+.q-context{
+  background:var(--paper-2);border-left:3px solid var(--gold);
+  padding:12px 16px;margin-bottom:20px;font-size:13px;color:var(--ink-2);
+  font-family:Georgia,serif;letter-spacing:.02em;
+}
+.q-context b{color:var(--navy)}
+
+/* Answer area */
+.answers{margin-top:20px}
+.choice-list{display:flex;flex-direction:column;gap:8px}
+.choice{
+  background:var(--paper-2);border:1px solid var(--line);
+  padding:14px 18px;display:flex;align-items:center;gap:14px;
+  cursor:pointer;font-size:15px;color:var(--ink);transition:.15s;
+}
+.choice:hover{background:var(--paper);border-color:var(--gold-soft)}
+.choice.selected{background:var(--gold-soft);border-color:var(--gold);font-weight:600}
+.choice .mark{
+  font-family:Georgia,serif;font-weight:700;color:var(--gold);
+  width:24px;height:24px;border:1px solid var(--gold);border-radius:50%;
+  display:inline-flex;align-items:center;justify-content:center;font-size:13px;
+  background:var(--paper);
+}
+.choice.selected .mark{background:var(--gold);color:var(--paper)}
+.choice input{display:none}
+
+/* Calculator / numeric input */
+.calc{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.calc-input{
+  flex:0 0 auto;width:180px;
+  font-family:Georgia,"Hiragino Mincho ProN",serif;
+  font-size:26px;font-weight:600;color:var(--navy);text-align:right;
+  padding:10px 14px;border:1px solid var(--line);background:var(--paper);
+  border-bottom:2px solid var(--gold);
+  outline:none;transition:.15s;
+  font-variant-numeric:tabular-nums;
+}
+.calc-input:focus{border-color:var(--gold);background:#fffdf6}
+.calc-unit{font-size:14px;color:var(--ink-2);font-family:Georgia,serif;letter-spacing:.04em}
+.calc-hint{font-size:12px;color:var(--ink-2);background:var(--paper-2);padding:8px 12px;border:1px dashed var(--line);margin-top:12px}
+
+/* Buttons */
+.actions{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap}
+.btn{
+  font:inherit;font-weight:600;font-size:14px;
+  padding:10px 20px;border:1px solid var(--ink-2);
+  background:var(--paper-2);color:var(--ink-2);cursor:pointer;letter-spacing:.04em;
+  transition:.15s;display:inline-flex;align-items:center;gap:8px;
+}
+.btn:hover{background:var(--ink-2);color:var(--paper)}
+.btn.primary{background:var(--navy);color:var(--paper);border-color:var(--navy)}
+.btn.primary:hover{background:var(--ink);color:var(--gold-soft)}
+.btn.ghost{border:1px solid var(--line);color:var(--ink-2);background:transparent}
+.btn.ghost:hover{background:var(--paper-2);color:var(--ink)}
+
+/* Result */
+.result{
+  margin-top:22px;padding:18px 22px;border:1px solid var(--line);
+  background:var(--paper-2);
+}
+.result.good{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.result.bad{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+.result-head{display:flex;align-items:center;gap:10px;font-weight:600;font-size:16px;margin-bottom:8px}
+.result-head .icon{display:inline-flex;width:24px;height:24px;border-radius:50%;align-items:center;justify-content:center}
+.result.good .icon{background:var(--good);color:#fff}
+.result.bad .icon{background:var(--bad);color:#fff}
+.result-head .icon svg{width:14px;height:14px}
+.result-body{font-size:14px;line-height:1.7;color:var(--ink)}
+.result-body b{color:var(--navy)}
+.result-body .answer-num{font-family:Georgia,serif;font-weight:700;color:var(--gold);font-size:18px}
+.citation{
+  margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);
+  font-size:12px;color:var(--ink-2);font-family:Georgia,serif;letter-spacing:.02em;
+}
+.citation b{color:var(--gold);font-weight:600}
+
+/* Footer / nav */
+.q-nav{
+  display:flex;justify-content:space-between;margin-top:24px;
+  font-family:Georgia,serif;letter-spacing:.04em;font-size:12px;color:var(--ink-2);
+}
+
+/* Score panel */
+.score-panel{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);
+  border:1px solid var(--line);margin-bottom:32px;
+}
+@media(max-width:720px){.score-panel{grid-template-columns:repeat(2,1fr)}}
+.score-cell{
+  background:var(--paper-2);padding:18px 22px;text-align:center;
+}
+.score-cell .label{
+  font-family:Georgia,serif;letter-spacing:.16em;font-size:10px;text-transform:uppercase;
+  color:var(--ink-2);margin-bottom:6px;
+}
+.score-cell .value{
+  font-family:Georgia,"Hiragino Mincho ProN",serif;font-weight:600;font-variant-numeric:tabular-nums;
+  font-size:36px;color:var(--navy);line-height:1;
+}
+.score-cell.gold .value{color:var(--gold)}
+.score-cell .sub{font-size:11px;color:var(--ink-2);margin-top:4px;font-family:Georgia,serif}
+
+/* Glossary */
+.glossary{
+  margin-top:48px;background:var(--paper-2);
+  border:1px solid var(--line);padding:28px 30px;
+}
+.glossary h3{
+  font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-weight:600;
+  font-size:17px;color:var(--navy);margin-bottom:14px;letter-spacing:.04em;
+  padding-bottom:8px;border-bottom:1px solid var(--line);
+}
+.glossary dl{display:grid;grid-template-columns:160px 1fr;gap:8px 18px;font-size:13px}
+@media(max-width:640px){.glossary dl{grid-template-columns:1fr}}
+.glossary dt{color:var(--gold);font-weight:600;font-family:Georgia,"Hiragino Mincho ProN",serif}
+.glossary dd{color:var(--ink-2);line-height:1.6}
+.glossary dd b{color:var(--navy)}
+
+/* Footer */
+footer{
+  margin-top:60px;padding-top:20px;border-top:1px solid var(--line);
+  font-size:11px;color:var(--ink-2);font-family:Georgia,serif;letter-spacing:.06em;text-align:center;
+}
+footer .notice{
+  background:var(--paper-2);border:1px dashed var(--line);padding:14px 18px;margin-bottom:18px;
+  text-align:left;font-family:"Hiragino Sans","Yu Gothic","Noto Sans JP",sans-serif;letter-spacing:0;
+  font-size:12px;line-height:1.7;color:var(--ink-2);
+}
+footer .notice b{color:var(--ink)}
+
+/* Hidden */
+.hidden{display:none !important}
+
+/* Toast */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  background:var(--navy);color:var(--paper);padding:10px 18px;font-size:13px;
+  border:1px solid var(--gold);box-shadow:var(--shadow);font-family:Georgia,serif;letter-spacing:.04em;
+  z-index:100;animation:toastIn .25s ease;
+}
+@keyframes toastIn{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
+
+/* Editor */
+.editor-wrap{margin-top:32px}
+.editor-toolbar,
+.editor-json-tools,
+.editor-form-actions{
+  display:flex;gap:10px;flex-wrap:wrap;
+}
+.editor-toolbar{margin-bottom:16px}
+.editor-grid{
+  display:grid;grid-template-columns:320px 1fr;gap:18px;
+}
+.editor-panel,
+.editor-json-panel{
+  background:#fffdf6;border:1px solid var(--line);box-shadow:var(--shadow);
+}
+.editor-panel-head,
+.editor-json-head{
+  display:flex;justify-content:space-between;align-items:center;gap:12px;
+  padding:16px 18px;border-bottom:1px solid var(--line);background:var(--paper-2);
+}
+.editor-panel-head h3,
+.editor-json-head h3{
+  font-size:16px;color:var(--navy);font-family:"Hiragino Mincho ProN","Yu Mincho",serif;
+}
+.editor-panel-head span,
+.editor-json-head span{font-size:12px;color:var(--ink-2)}
+.editor-list{max-height:760px;overflow:auto;padding:10px}
+.editor-item{
+  width:100%;text-align:left;border:1px solid var(--line);background:var(--paper-2);
+  padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:.15s;
+}
+.editor-item:hover{background:var(--paper)}
+.editor-item.active{border-color:var(--gold);background:#fbf4e2}
+.editor-item-id{font-family:Georgia,serif;font-size:11px;letter-spacing:.12em;color:var(--gold);margin-bottom:4px}
+.editor-item-title{font-size:14px;color:var(--navy);font-weight:600;line-height:1.45}
+.editor-item-meta{margin-top:6px;font-size:11px;color:var(--ink-2);display:flex;gap:8px;flex-wrap:wrap}
+.editor-form-body{padding:18px}
+.editor-form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px 16px}
+.editor-field{display:flex;flex-direction:column;gap:6px}
+.editor-field.full{grid-column:1 / -1}
+.editor-field label{font-size:12px;color:var(--ink-2);letter-spacing:.04em}
+.editor-field input,
+.editor-field select,
+.editor-field textarea,
+.editor-json-textarea{
+  width:100%;border:1px solid var(--line);background:var(--paper);padding:10px 12px;
+  font:inherit;color:var(--ink);transition:.15s;
+}
+.editor-field input:focus,
+.editor-field select:focus,
+.editor-field textarea:focus,
+.editor-json-textarea:focus{outline:none;border-color:var(--gold);background:#fffdf6}
+.editor-field textarea{min-height:92px;resize:vertical}
+.editor-subpanel{
+  border:1px solid var(--line);background:var(--paper-2);padding:14px;margin-top:16px;
+}
+.editor-subpanel h4{
+  font-size:14px;color:var(--navy);margin-bottom:10px;font-family:"Hiragino Mincho ProN","Yu Mincho",serif;
+}
+.editor-help{font-size:12px;color:var(--ink-2);margin-top:8px;line-height:1.7}
+.editor-choice-rows{display:flex;flex-direction:column;gap:10px}
+.editor-choice-row{
+  display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;
+}
+.editor-choice-row input[type="text"]{min-width:0}
+.editor-choice-correct{
+  width:34px;height:34px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;background:#fffdf6;
+}
+.editor-json-panel{margin-top:18px}
+.editor-json-body{padding:18px}
+.editor-json-textarea{min-height:240px;resize:vertical;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.6}
+.editor-csv-textarea{min-height:200px;resize:vertical;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.6;margin-top:16px}
+.editor-inline-note{font-size:12px;color:var(--ink-2);margin-top:10px;line-height:1.7}
+.editor-badge{display:inline-flex;align-items:center;padding:3px 8px;background:var(--navy);color:var(--paper);font-size:10px;letter-spacing:.1em}
+.editor-file-input{font-size:12px;color:var(--ink-2)}
+@media(max-width:900px){
+  .editor-grid{grid-template-columns:1fr}
+  .editor-list{max-height:280px}
+}
+@media(max-width:720px){
+  .editor-form-grid{grid-template-columns:1fr}
+  .editor-choice-row{grid-template-columns:34px 1fr}
+  .editor-choice-row .btn{grid-column:1 / -1}
+}
+@media(max-width:560px){
+  .shell{padding:18px 14px 56px}
+  header.hero{padding:18px 0 16px;margin-bottom:22px}
+  .eyebrow{font-size:10px;letter-spacing:.18em;line-height:1.5}
+  h1{font-size:27px;line-height:1.18}
+  .subtitle{font-size:13px;line-height:1.7}
+  .hero-meta{gap:8px;flex-direction:column;align-items:flex-start;font-size:11px;letter-spacing:.04em}
+
+  .modes{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--line)}
+  .modes button{min-height:52px;padding:12px 10px;font-size:13px;line-height:1.35;border-bottom:1px solid var(--line)}
+  .modes button.active{border-bottom:3px solid var(--gold)}
+
+  .section-title{gap:10px;margin:26px 0 12px}
+  .section-title h2{font-size:18px;line-height:1.4}
+  .cat-card{padding:18px 16px}
+  .cat-card .cat-name{font-size:16px}
+  .cat-card .cat-desc{font-size:12px}
+
+  .score-panel{grid-template-columns:repeat(2,1fr);margin-bottom:22px}
+  .score-cell{padding:14px 12px}
+  .score-cell .value{font-size:28px}
+  .score-cell .sub{font-size:10px}
+
+  .q-card{padding:20px 16px 22px}
+  .q-meta{gap:8px;flex-wrap:wrap;font-size:10px;letter-spacing:.12em;margin-bottom:12px}
+  .q-difficulty{margin-left:0}
+  .q-text{font-size:17px;line-height:1.75;margin-bottom:16px}
+  .q-context{padding:10px 12px;font-size:12px}
+  .choice{padding:12px 12px;gap:10px;font-size:14px;align-items:flex-start}
+  .choice .mark{width:22px;height:22px;font-size:12px;flex:0 0 22px}
+  .calc{display:grid;grid-template-columns:1fr auto;gap:10px}
+  .calc-input{width:100%;min-width:0;font-size:24px;padding:10px 12px}
+  .calc-unit{align-self:center}
+  .calc-hint{font-size:11px;line-height:1.6}
+  .actions{flex-direction:column;gap:8px}
+  .btn{width:100%;justify-content:center;min-height:44px;padding:11px 16px}
+  .q-nav{flex-direction:column;gap:10px;align-items:stretch;text-align:center}
+  .q-nav #q-position{order:-1;padding:4px 0}
+  .result{padding:14px 14px}
+  .result-head{font-size:15px}
+  .result-body{font-size:13px}
+
+  .glossary{margin-top:32px;padding:18px 16px}
+  .glossary h3{font-size:16px}
+  .glossary dl{gap:6px 0}
+  .glossary dt{margin-top:8px}
+
+  .editor-toolbar,
+  .editor-json-tools,
+  .editor-form-actions{flex-direction:column}
+  .editor-toolbar .btn,
+  .editor-json-tools .btn,
+  .editor-form-actions .btn{width:100%}
+  .editor-panel-head,
+  .editor-json-head{padding:14px 14px;align-items:flex-start;flex-direction:column}
+  .editor-form-body,
+  .editor-json-body{padding:14px}
+  .editor-list{padding:8px}
+  .editor-item{padding:11px 12px}
+  .editor-choice-row{grid-template-columns:28px 1fr}
+  .editor-choice-correct{width:28px;height:28px}
+  .editor-subpanel{padding:12px;margin-top:14px}
+  .editor-json-textarea{min-height:220px}
+  .editor-csv-textarea{min-height:180px}
+
+  footer .notice{padding:12px 12px;font-size:11px}
+}
+@media(max-width:390px){
+  .modes{grid-template-columns:1fr}
+  .score-panel{grid-template-columns:1fr}
+  h1{font-size:24px}
+  .q-text{font-size:16px}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<header class="hero">
+  <div class="eyebrow">EOS Corporation · Bonus Plan Study Lab — 2026.04</div>
+  <h1>EOSボーナスプラン <span class="accent">学習ラボ</span></h1>
+  <p class="subtitle">概要書面（2026年4月度改定版）に基づく、ボーナス計算とビジネスパートナー条件の自学自習用ドリルです。グループ内勉強会でご活用ください。</p>
+  <div class="hero-meta">
+    <span>出典 <b>概要書面 (1)</b></span>
+    <span>頁数 <b>P17〜P31</b></span>
+    <span>問題数 <b id="q-total">—</b></span>
+  </div>
+</header>
+
+<div class="modes" id="modes">
+  <button data-mode="browse" class="active">問題一覧</button>
+  <button data-mode="sequential">通しで挑戦</button>
+  <button data-mode="review">誤答復習</button>
+  <button data-mode="editor">編集</button>
+</div>
+
+<div class="score-panel">
+  <div class="score-cell"><div class="label">回答済み</div><div class="value" id="s-answered">0</div><div class="sub">/ 全問題</div></div>
+  <div class="score-cell gold"><div class="label">正解</div><div class="value" id="s-correct">0</div><div class="sub">comprehend</div></div>
+  <div class="score-cell"><div class="label">正答率</div><div class="value" id="s-rate">—</div><div class="sub">accuracy</div></div>
+  <div class="score-cell gold"><div class="value" id="s-streak" style="font-size:28px">—</div><div class="sub">連続正解</div></div>
+</div>
+
+<!-- 問題一覧 HOME -->
+<section id="home">
+  <div class="section-title"><span class="num">01</span><h2>カテゴリを選んで学習を始める</h2></div>
+  <div class="category-grid" id="cat-grid"></div>
+
+  <div class="section-title" style="margin-top:48px"><span class="num">02</span><h2>おすすめ習熟順序</h2></div>
+  <div style="font-size:13.5px;line-height:1.9;color:var(--ink-2);background:var(--paper-2);border:1px solid var(--line);padding:20px 24px">
+    <p style="margin-bottom:10px"><b style="color:var(--navy)">Step 1 ·</b> まずは 「用語学習クイズ」 から。PV / BV / BP / BC / 系列組織など、全体の土台になる言葉を先に揃えます。</p>
+    <p style="margin-bottom:10px"><b style="color:var(--navy)">Step 2 ·</b> 次に 「概要書面の基本ルール」。月度の定義・支払事務手数料・ボーナス取得条件を押さえます。</p>
+    <p style="margin-bottom:10px"><b style="color:var(--navy)">Step 3 ·</b> その後 「ボーナス計算ドリル」。アクティブ / メイン / BP各種の金額を試算します。</p>
+    <p><b style="color:var(--navy)">Step 4 ·</b> 最後に 「ビジネスパートナー条件」。BP・ABP・EBPの認定基準を整理します。</p>
+  </div>
+
+  <div class="glossary">
+    <h3>主な用語（学習前に確認）</h3>
+    <dl>
+      <dt>PV</dt><dd><b>ポイントバリュー</b> — 購入に対するポイント。ボーナス取得のために必要。商品ごとに設定。</dd>
+      <dt>BV</dt><dd><b>ビジネスバリュー</b> — メインボーナス計算時に使用するポイント。商品ごとに設定。</dd>
+      <dt>BP (BV)</dt><dd><b>ビジネスポイント</b> — 月度の総ビジネスポイント。各種ボーナス（%/均等配分）の母数。</dd>
+      <dt>BC (Base Center)</dt><dd><b>ベースセンター</b> — 任意またはポジション指定で設置。あなたのBCは直接紹介者の人数にはカウントされません（アクティブボーナス取得条件対象外）。</dd>
+      <dt>レギュラーアクティブ</dt><dd>該当月に <b>8,000PV以上</b> の購入実績があること（自分のいずれかのポジション）。アクティブボーナス取得の前提条件。</dd>
+      <dt>系列組織</dt><dd><b>紹介者系列組織</b> (スポンサー系列) と <b>メインボーナス組織</b> (バイナリー系列) の2種類。前者は階層構造、後者は左右の組織構造をとります。</dd>
+    </dl>
+  </div>
+</section>
+
+<!-- クイズ -->
+<section id="quiz" class="quiz-wrap hidden">
+  <div class="q-card" id="q-card"></div>
+  <div class="q-nav">
+    <button class="btn ghost" id="btn-prev">← 前の問題</button>
+    <span id="q-position">— / —</span>
+    <button class="btn ghost" id="btn-next">次の問題 →</button>
+  </div>
+</section>
+
+<section id="editor" class="editor-wrap hidden">
+  <div class="editor-toolbar">
+    <button class="btn primary" id="editor-add-choice-question">選択問題を追加</button>
+    <button class="btn primary" id="editor-add-numerical-question">計算問題を追加</button>
+    <button class="btn" id="editor-duplicate">複製</button>
+    <button class="btn ghost" id="editor-preview">この問題をプレビュー</button>
+    <button class="btn ghost" id="editor-delete">削除</button>
+  </div>
+
+  <div class="editor-grid">
+    <aside class="editor-panel">
+      <div class="editor-panel-head">
+        <h3>問題一覧</h3>
+        <span id="editor-count">0問</span>
+      </div>
+      <div class="editor-list" id="editor-list"></div>
+    </aside>
+
+    <div class="editor-panel">
+      <div class="editor-panel-head">
+        <h3 id="editor-current-title">問題を編集</h3>
+        <span class="editor-badge">BROWSER EDITOR</span>
+      </div>
+      <div class="editor-form-body">
+        <div class="editor-form-grid">
+          <div class="editor-field">
+            <label for="editor-id">問題ID</label>
+            <input id="editor-id" type="text" placeholder="例: B12">
+          </div>
+          <div class="editor-field">
+            <label for="editor-cat">カテゴリ</label>
+            <select id="editor-cat">
+              <option value="terms">用語学習クイズ</option>
+              <option value="basic">概要書面の基本ルール</option>
+              <option value="calc">ボーナス計算ドリル</option>
+              <option value="partner">ビジネスパートナー条件</option>
+            </select>
+          </div>
+          <div class="editor-field">
+            <label for="editor-type">問題タイプ</label>
+            <select id="editor-type">
+              <option value="choice">選択式</option>
+              <option value="numerical">数値入力</option>
+            </select>
+          </div>
+          <div class="editor-field">
+            <label for="editor-diff">難易度</label>
+            <select id="editor-diff">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+            </select>
+          </div>
+          <div class="editor-field">
+            <label for="editor-unit">単位</label>
+            <input id="editor-unit" type="text" placeholder="円 / BV / 名 など">
+          </div>
+          <div class="editor-field">
+            <label for="editor-tolerance">許容誤差（数値問題のみ）</label>
+            <input id="editor-tolerance" type="number" step="any" placeholder="0">
+          </div>
+          <div class="editor-field full">
+            <label for="editor-q">問題文</label>
+            <textarea id="editor-q" placeholder="ここに問題文を入力"></textarea>
+          </div>
+          <div class="editor-field full">
+            <label for="editor-ctx">補足情報 / 前提条件（任意）</label>
+            <textarea id="editor-ctx" placeholder="例: 1口 = 2,400円"></textarea>
+          </div>
+        </div>
+
+        <div class="editor-subpanel" id="editor-choice-panel">
+          <h4>選択肢</h4>
+          <div class="editor-choice-rows" id="editor-choice-rows"></div>
+          <div class="editor-form-actions" style="margin-top:12px">
+            <button class="btn" id="editor-add-option">選択肢を追加</button>
+          </div>
+          <div class="editor-help">左のラジオで正解を1つ選んでください。最低2個の選択肢が必要です。</div>
+        </div>
+
+        <div class="editor-subpanel hidden" id="editor-numerical-panel">
+          <h4>数値問題の正解設定</h4>
+          <div class="editor-field full">
+            <label for="editor-accept">正解値</label>
+            <input id="editor-accept" type="text" placeholder="例: 7200 または 16666,16667">
+          </div>
+          <div class="editor-help">複数の正解候補を許可したい場合はカンマ区切りで入力してください。</div>
+        </div>
+
+        <div class="editor-form-grid" style="margin-top:16px">
+          <div class="editor-field full">
+            <label for="editor-explain">解説</label>
+            <textarea id="editor-explain" placeholder="正解の理由や計算過程を入力"></textarea>
+          </div>
+          <div class="editor-field full">
+            <label for="editor-cite">出典</label>
+            <textarea id="editor-cite" placeholder="例: 概要書面 P23「メインボーナス」"></textarea>
+          </div>
+        </div>
+
+        <div class="editor-form-actions" style="margin-top:18px">
+          <button class="btn primary" id="editor-save">この内容を保存</button>
+          <button class="btn" id="editor-reset">フォームを元に戻す</button>
+          <button class="btn ghost" id="editor-export">JSONを表示</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="editor-json-panel">
+    <div class="editor-json-head">
+      <h3>JSON入出力</h3>
+      <span>Excel/他ツール連携用</span>
+    </div>
+    <div class="editor-json-body">
+      <textarea id="editor-json" class="editor-json-textarea" placeholder="ここに現在の問題JSONを表示 / 貼り付け"></textarea>
+      <div class="editor-json-tools" style="margin-top:14px">
+        <button class="btn" id="editor-download">JSONをダウンロード</button>
+        <button class="btn" id="editor-import">このJSONで置き換える</button>
+        <input id="editor-file" class="editor-file-input" type="file" accept="application/json,.json">
+      </div>
+      <textarea id="editor-csv" class="editor-json-textarea editor-csv-textarea" placeholder="ここにCSVを貼り付けるか、下のCSVファイル選択から読み込んでください"></textarea>
+      <div class="editor-json-tools" style="margin-top:14px">
+        <button class="btn" id="editor-csv-export">現在の問題をCSV表示</button>
+        <button class="btn" id="editor-csv-download">CSVをダウンロード</button>
+        <button class="btn" id="editor-csv-template">CSVテンプレートを表示</button>
+        <button class="btn" id="editor-csv-import">このCSVで置き換える</button>
+        <input id="editor-csv-file" class="editor-file-input" type="file" accept="text/csv,.csv">
+      </div>
+      <div class="editor-inline-note">
+        ※ 「JSONを表示」で今の問題を展開し、編集後に「このJSONで置き換える」を押すと一括更新できます。<br>
+        ※ CSV列は <code>id,cat,type,diff,q,ctx,unit,tolerance,accept,choice1,choice2,choice3,choice4,correct,explain,cite</code> を使えます。<br>
+        ※ 読み込み時は回答履歴・正答率をいったんリセットします。
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="notice">
+    <b>ご利用にあたって</b><br>
+    本アプリはEOSコーポレーションのボーナスプランをグループ内で自主的に学ぶための学習支援ツールです。記載内容はすべて <b>「概要書面（2026年4月度改定版）」</b> に基づいています。確定的な収入・収益を保証するものではなく、実際のボーナス計算は個別の状況・適用条件により異なります。上部の <b>「編集」</b> タブから、ブラウザ上で問題追加・修正・削除・JSON/CSV一括入出力ができます。
+  </div>
+  <div>EOS BONUS PLAN STUDY LAB · Educational Use Only · No Income Guarantee</div>
+</footer>
+
+</div>
+
+<div id="toast-host"></div>
+
+<script>
+const CATEGORIES = [
+  { key:"terms", name:"用語学習クイズ", desc:"PV / BV / BP / BC / 系列組織など、ボーナスプラン理解の土台になる用語を最初に固めます。", icon:"用語" },
+  { key:"basic", name:"概要書面の基本ルール", desc:"PV/BVの定義、月度の区切り、支払事務手数料、源泉徴収など、ボーナス計算の大前提。", icon:"規則" },
+  { key:"calc", name:"ボーナス計算ドリル", desc:"アクティブ・メイン・BP 各ボーナスの金額計算。電卓入力で試算します。", icon:"計算" },
+  { key:"partner", name:"ビジネスパートナー条件", desc:"BP / ABP / EBP の認定要件、ボードメンバー / ワールドボーナスの条件。", icon:"資格" }
+];
+
+const QUESTIONS = [
+  { id:"T01", cat:"terms", type:"choice", diff:1, q:"PVとは何を指す用語ですか？", choices:[{v:"購入に対するポイントで、ボーナス取得のために必要なポイント", ok:true},{v:"メインボーナス計算だけに使うポイント", ok:false},{v:"年間累計ボーナス金額", ok:false},{v:"登録費用の税抜金額", ok:false}], explain:"<b>PV</b> は購入に対するポイントで、ボーナス取得のために必要です。商品ごとに設定されています。", cite:"概要書面 P21-22「ボーナスプランの理解のためによく使う用語の解説」" },
+  { id:"T02", cat:"terms", type:"choice", diff:1, q:"BVとは何を指す用語ですか？", choices:[{v:"送料計算のためのポイント", ok:false},{v:"メインボーナス計算時に使用するポイント", ok:true},{v:"本人確認の完了状況", ok:false},{v:"スポンサー系列の人数", ok:false}], explain:"<b>BV</b> はメインボーナス計算時に使用するポイントです。商品ごとに設定されています。", cite:"概要書面 P21-22「ボーナスプランの理解のためによく使う用語の解説」" },
+  { id:"T03", cat:"terms", type:"choice", diff:1, q:"BP（ビジネスポイント）は主に何の母数として扱うと理解するとよいですか？", choices:[{v:"各種ボーナスの%配分・均等配分の母数", ok:true},{v:"会員登録時の本人確認番号", ok:false},{v:"送料の計算単位", ok:false},{v:"毎月の最低購入箱数", ok:false}], explain:"<b>BP（ビジネスポイント）</b> は月度の総ビジネスポイントで、各種ボーナスの%配分や均等配分の母数として使われます。", cite:"概要書面 P21-22「ボーナスプランの理解のためによく使う用語の解説」" },
+  { id:"T04", cat:"terms", type:"choice", diff:2, q:"BC（ベースセンター）について正しい説明はどれですか？", choices:[{v:"必ず毎月自動で1つ増えるポジション", ok:false},{v:"任意またはポジション指定で設置するもので、あなたのBCは直接紹介者人数に数えない", ok:true},{v:"ボーナス振込先の銀行口座のこと", ok:false},{v:"海外活動専用の系列名", ok:false}], explain:"<b>BC（ベースセンター）</b> は任意またはポジション指定で設置するもので、あなたのBCは直接紹介者の人数にはカウントされません。", cite:"概要書面 P21-22「ボーナスプランの理解のためによく使う用語の解説」および P17 アクティブボーナス注釈" },
+  { id:"T05", cat:"terms", type:"choice", diff:1, q:"レギュラーアクティブとは何を満たした状態ですか？", choices:[{v:"当該月にいずれかのポジションで8,000PV以上の購入実績がある状態", ok:true},{v:"年間50万円以上のボーナス受取がある状態", ok:false},{v:"直接紹介者が8名いる状態", ok:false},{v:"メインボーナス左右が24,000BVに達した状態", ok:false}], explain:"<b>レギュラーアクティブ</b> とは、当該月に自分のいずれかのポジションで <b>8,000PV以上</b> の購入実績がある状態です。", cite:"概要書面 P17 / P21-22「ボーナスプランの理解のためによく使う用語の解説」" },
+  { id:"T06", cat:"terms", type:"choice", diff:2, q:"「紹介者系列組織（スポンサー系列）」の理解として近いのはどれですか？", choices:[{v:"左右に分かれるメインボーナス専用の組織", ok:false},{v:"実際に紹介したつながりで広がる階層型の系列", ok:true},{v:"会社が自動で割り振る配送ルート", ok:false},{v:"銀行振込の明細分類名", ok:false}], explain:"<b>紹介者系列組織（スポンサー系列）</b> は、実際に紹介したつながりで広がる階層型の系列として理解すると整理しやすいです。", cite:"概要書面 P21-22「ボーナスプランの理解のためによく使う用語の解説」" },
+  { id:"T07", cat:"terms", type:"choice", diff:2, q:"「メインボーナス組織（バイナリー系列）」の理解として近いのはどれですか？", choices:[{v:"左右の組織構造でメインボーナス計算に使う系列", ok:true},{v:"紹介者の家族だけで構成される系列", ok:false},{v:"在庫保管場所の区分", ok:false},{v:"支払調書の送付先分類", ok:false}], explain:"<b>メインボーナス組織（バイナリー系列）</b> は左右の組織構造をとり、メインボーナス計算で使われます。", cite:"概要書面 P21-22「ボーナスプランの理解のためによく使う用語の解説」" },
+  { id:"T08", cat:"terms", type:"choice", diff:2, q:"「系列組織」には大きく分けて何種類ありますか？", choices:[{v:"1種類だけ", ok:false},{v:"2種類（紹介者系列組織とメインボーナス組織）", ok:true},{v:"3種類（国内・海外・法人）", ok:false},{v:"4種類（BP・ABP・EBP・BM）", ok:false}], explain:"本アプリでは系列組織を <b>紹介者系列組織（スポンサー系列）</b> と <b>メインボーナス組織（バイナリー系列）</b> の2種類で整理しています。", cite:"概要書面 P21-22「ボーナスプランの理解のためによく使う用語の解説」" },
+  { id:"B01", cat:"basic", type:"choice", diff:1, q:"メインボーナス（バイナリーの左右）が累計ポイントに基づいて発生する際、左右それぞれBVがいくらに達するごとに3,000円が発生しますか？", choices:[{v:"12,000BV", ok:false},{v:"24,000BV", ok:true},{v:"48,000BV", ok:false},{v:"100,000BV", ok:false}], explain:"メインボーナス組織（バイナリー系列）において、当該月に左右それぞれ累計ビジネスポイントが <b>24,000BV</b> に達するごとに 3,000円 が発生します。", cite:"概要書面 P23「メインボーナスが発生する累計ビジネスポイントと金額」" },
+  { id:"B02", cat:"basic", type:"choice", diff:1, q:"メインボーナスを取得するポジションで購入実績がいくら以上必要ですか？", choices:[{v:"1,000PV", ok:false},{v:"5,000PV", ok:false},{v:"8,000PV", ok:true},{v:"20,000PV", ok:false}], explain:"メインボーナスを取得するポジションで <b>8,000PV以上</b> の購入実績が必要です（「レギュラーアクティブ」要件）。", cite:"概要書面 P23、P17 アクティブボーナス取得条件" },
+  { id:"B03", cat:"basic", type:"choice", diff:2, q:"ボーナス計算の対象となる「当該月度」の区切りはいつからいつまでですか？", choices:[{v:"前月1日〜末日", ok:false},{v:"当該月1日〜末日", ok:true},{v:"前月16日〜当月15日", ok:false},{v:"当月1日〜当月25日", ok:false}], explain:"各種ボーナスは、<b>当該月1日から末日までの実績</b> に基づいて、当社が定めるボーナスプランにより計算します。", cite:"概要書面「ボーナス支払規定」" },
+  { id:"B04", cat:"basic", type:"choice", diff:1, q:"ボーナスの振込日はいつですか？（土日祝日の場合）", choices:[{v:"当月25日", ok:false},{v:"翌月25日（前営業日）", ok:true},{v:"翌月末日", ok:false},{v:"ボーナス発生から3営業日以内", ok:false}], explain:"当該月のボーナスは <b>翌月25日</b> に登録口座へお振込みします。土日祝日の場合は <b>前営業日</b> となります。", cite:"概要書面「ボーナス支払規定」" },
+  { id:"B05", cat:"basic", type:"choice", diff:2, q:"発生するボーナス（税抜額）が3,000円未満の場合の取り扱いは？", choices:[{v:"翌月に繰越さず消滅する", ok:false},{v:"累計金額が3,000円以上になった月にまとめて振込まれる", ok:true},{v:"自動的にEポイントに変換される", ok:false},{v:"年度末に一括精算される", ok:false}], explain:"発生するボーナス（税抜額）が <b>3,000円未満</b> の場合は、累計金額が <b>3,000円以上</b> になった月にまとめてお振込みします。", cite:"概要書面「ボーナス支払規定」" },
+  { id:"B06", cat:"basic", type:"choice", diff:1, q:"ボーナス支払事務手数料はどのくらい？（ゆうちょ銀行・税込）", choices:[{v:"330円", ok:false},{v:"550円", ok:false},{v:"770円", ok:true},{v:"880円", ok:false}], explain:"ゆうちょ銀行の場合は <b>770円（税込）</b>、その他金融機関の場合は <b>880円（税込）</b> がボーナス支払事務手数料として必要です。", cite:"概要書面「ボーナス支払規定」" },
+  { id:"B07", cat:"basic", type:"choice", diff:1, q:"月間ボーナス金額がいくらを超えると源泉徴収が行われますか？（個人）", choices:[{v:"5万円", ok:false},{v:"10万円", ok:false},{v:"12万円", ok:true},{v:"50万円", ok:false}], explain:"ボーナス金額が月額で <b>12万円</b> を超える場合は源泉徴収を行います（法人登録の場合は適用されません）。", cite:"概要書面「ボーナス支払規定」" },
+  { id:"B08", cat:"basic", type:"choice", diff:1, q:"年間のボーナス合計金額がいくらを超えると支払調書が作成・郵送されますか？", choices:[{v:"12万円", ok:false},{v:"30万円", ok:false},{v:"50万円", ok:true},{v:"100万円", ok:false}], explain:"ボーナス金額が年間で <b>50万円を超えた方</b> に支払調書を作成し、登録住所へ郵送します。", cite:"概要書面「ボーナス支払規定」" },
+  { id:"B09", cat:"basic", type:"choice", diff:2, q:"ボーナス取得の大前提となる2つの提出・受講要件は？（本人確認書類とセミナー）", choices:[{v:"「本人確認書類」の提出と「コンプライアンスセミナー」の受講", ok:true},{v:"「会員登録申込書」の提出と「年会費の支払い」", ok:false},{v:"「銀行口座」の登録と「住所証明書」の提出", ok:false},{v:"「紹介者との面談」と「商品購入完了」", ok:false}], explain:"ボーナス取得条件には <b>「本人確認書類」</b> の提出（外国籍の方は在留カード等のコピー）と、<b>「コンプライアンスセミナー」</b> の受講が必要です。未提出・未受講の場合はボーナス支払額に制限がかかります。", cite:"概要書面「ボーナス取得条件」" },
+  { id:"B10", cat:"basic", type:"numerical", diff:2, unit:"PV", q:"あなたがUC会員からEOS会員へステップアップした月、ステップアップ後に商品を購入しました。<br>EOS会員のボーナス取得条件（<b>8,000PV以上</b>）を満たすには、当該月にいくら以上の購入実績が必要ですか？", accept:[8000], explain:"メインボーナスおよびアクティブボーナスを取得するポジションでは、当該月に <b>8,000PV以上</b> の購入実績が必要です。", cite:"概要書面 P23「PV 8,000 以上」" },
+  { id:"B11", cat:"basic", type:"choice", diff:2, q:"ベースセンター（BC）で購入した商品は、アクティブボーナスの取得条件にカウントされますか？", choices:[{v:"される（直接紹介者と同様）", ok:false},{v:"されない（あなたのBCはカウント対象外）", ok:true},{v:"されるが上限が設定される", ok:false},{v:"商品カテゴリによって異なる", ok:false}], explain:"<b>あなたのベースセンター（BC）の購入分</b> は、アクティブボーナスの取得条件にはカウントされません（直接紹介者の人数にも数えません）。", cite:"概要書面 P17 アクティブボーナス注釈" },
+  { id:"C01", cat:"calc", type:"numerical", diff:1, unit:"円", q:"アクティブボーナスを3口取得しました。ボーナス額はいくらですか？（1口 = 2,400円）", ctx:"<b>1口 = 2,400円</b>（アクティブボーナス）", accept:[7200], tolerance:0, explain:"<b>1口 取得で 2,400円</b> が支払われます。3口なら <b>2,400 × 3 = 7,200円</b>。", cite:"概要書面 P17「アクティブボーナス · ボーナス内容」" },
+  { id:"C02", cat:"calc", type:"numerical", diff:2, unit:"円", q:"アクティブボーナスを10口取得しました。ボーナス額はいくらですか？（1口 = 2,400円）", ctx:"<b>1口 = 2,400円</b>", accept:[24000], explain:"2,400円 × 10口 = <b>24,000円</b>。", cite:"概要書面 P17「アクティブボーナス」" },
+  { id:"C03", cat:"calc", type:"numerical", diff:2, unit:"円", q:"メインボーナス組織の左右が、当該月にそれぞれ累計48,000BVに達しました。メインボーナス額はいくらですか？<br>（24,000BVごとに3,000円）", accept:[6000], explain:"左右それぞれ48,000BV ÷ 24,000BV = 2セット → 2 × 3,000円 = <b>6,000円</b>。", cite:"概要書面 P23「メインボーナス · ボーナス内容」" },
+  { id:"C04", cat:"calc", type:"numerical", diff:3, unit:"円", q:"メインボーナス組織の左右が、それぞれ累計72,000BVに達しました。メインボーナス額はどうなりますか？", accept:[9000], explain:"72,000BV ÷ 24,000BV = 3セット → 3 × 3,000円 = <b>9,000円</b>。ポイントの端数が余っても次月度に繰越されません。", cite:"概要書面 P23「メインボーナス · ボーナス内容」" },
+  { id:"C05", cat:"calc", type:"numerical", diff:3, unit:"万円", q:"当該月にアクティブボーナスのみを取得した場合、メインボーナスの <b>支払上限額</b> はいくらですか？（万円単位）", ctx:"支払上限額：Active取得のみ=20万円, Star=50万円, Star+BP=100万円", accept:[20], explain:"メインボーナス支払上限額は、活動実績により異なり：<br>・アクティブ取得のみ：<b>20万円</b><br>・スターメンバーボーナス取得：50万円<br>・スター＋BPボーナス取得：100万円", cite:"概要書面 P23「メインボーナス · 支払上限額」" },
+  { id:"C06", cat:"calc", type:"numerical", diff:2, unit:"BV", q:"月間4箱以上購入した場合、4箱目以降の1箱あたりの計上BVはいくらですか？", ctx:"4箱以上 → 4箱目以降 <b>1箱 2,200BV</b> を計上", accept:[2200], explain:"月間4箱以上購入すると、合計4箱目以降は <b>1箱につき 2,200BV</b> を計上します（本人のメインボーナス組織に積算）。", cite:"概要書面 P23「BV補足」" },
+  { id:"C07", cat:"calc", type:"numerical", diff:3, unit:"円", q:"月間の総ビジネスポイントが 5,000,000BP でした。スターメンバーボーナス取得者が3名いる場合、1人あたりのスターメンバーボーナス額は？（<b>総BP × 1%</b> を均等配分）", ctx:"スターメンバーボーナス：総BP × 1% を取得権利者で均等配分", accept:[Math.round(5000000 * 0.01 / 3)], tolerance:1, explain:"5,000,000 × 1% = 50,000円 ÷ 3名 = <b>約16,666円</b>（小数点以下端数処理は四捨五入）。", cite:"概要書面 P21「スターメンバーボーナス · ボーナス内容」" },
+  { id:"C08", cat:"calc", type:"numerical", diff:3, unit:"円", q:"月間の総ビジネスポイントが 10,000,000BP。BPボーナス取得者が5名。1人あたりのBPボーナス額は？（<b>総BP × 5%</b>）", ctx:"BPボーナス：総BP × 5% を BPボーナス取得権利者で均等配分", accept:[Math.round(10000000 * 0.05 / 5)], tolerance:1, explain:"10,000,000 × 5% = 500,000円 ÷ 5名 = <b>100,000円 / 名</b>。", cite:"概要書面 P26「BPボーナス · ボーナス内容」" },
+  { id:"C09", cat:"calc", type:"numerical", diff:3, unit:"円", q:"月間の総ビジネスポイントが 8,000,000BP。ABPボーナス取得者が4名。1人あたりのABPボーナス額は？（<b>総BP × 2%</b>）", ctx:"ABPボーナス：総BP × 2% を ABPボーナス取得権利者で均等配分", accept:[Math.round(8000000 * 0.02 / 4)], tolerance:1, explain:"8,000,000 × 2% = 160,000円 ÷ 4名 = <b>40,000円 / 名</b>。", cite:"概要書面 P28「ABPボーナス · ボーナス内容」" },
+  { id:"C10", cat:"calc", type:"numerical", diff:2, unit:"円", q:"アクティブボーナス1口取得（2,400円）とメインボーナス6,000円が発生。ゆうちょ銀行への振込。受取金額は？<br>（ゆうちょ770円（税込）が差し引かれる）", ctx:"2,400円 + 6,000円 = 8,400円 → ゆうちょ770円（税込）差し引き", accept:[7630], explain:"合計 8,400円 − 事務手数料 <b>770円</b>（ゆうちょ・税込） = <b>7,630円</b>。", cite:"概要書面「ボーナス支払事務手数料」" },
+  { id:"P01", cat:"partner", type:"choice", diff:1, q:"EOSビジネスパートナー（EOS-BP）は全部で何段階の制度ですか？", choices:[{v:"2段階（BP / EBP）", ok:false},{v:"3段階（BP / ABP / EBP）", ok:true},{v:"4段階（BP / ABP / EBP / 取締役）", ok:false},{v:"EOS-BPは段階に分かれていない", ok:false}], explain:"EOS-BPには <b>3つの段階</b> があり、段階別の条件を達成することで、その段階に応じたボーナスをお支払いします：<b>BP → ABP → EBP</b>。", cite:"概要書面 P25〜「EOS-BP 制度のご紹介」" },
+  { id:"P02", cat:"partner", type:"choice", diff:2, q:"EOS-BPの認定を受けるための必須要件はどれですか？", choices:[{v:"年間ボーナス100万円以上の獲得", ok:false},{v:"認定会の受講＋認定試験合格", ok:true},{v:"最大ポジション数の獲得", ok:false},{v:"所属グループの代表になること", ok:false}], explain:"EOS-BPは認定制度であり、所定の基準を満たした上で、当社が実施する <b>「EOS-BP認定会」</b> を受講し、認定試験に合格することが認定条件です。", cite:"概要書面 P25「EOS-BP 認定条件」" },
+  { id:"P03", cat:"partner", type:"choice", diff:2, q:"EOS-ABPの認定条件は「条件I」と「条件II」のどちらかを満たすことですが、条件Iを続ける期間は？", choices:[{v:"1ヶ月", ok:false},{v:"3ヶ月連続", ok:true},{v:"6ヶ月連続", ok:false},{v:"12ヶ月連続", ok:false}], explain:"条件Iは「認定を受けるポジションで以下の基準を同時に <b>3ヶ月連続</b> で達成すること」。", cite:"概要書面 P27「EOS-ABP · 条件I」" },
+  { id:"P04", cat:"partner", type:"choice", diff:3, q:"EOS-EBPの認定に必要な「期間内の達成月数」はどれくらいですか？", ctx:"EBPの達成期間：毎年 12月度〜翌5月度 の6ヶ月間、または 6月度〜11月度 の6ヶ月間", choices:[{v:"2ヶ月達成", ok:false},{v:"3ヶ月達成", ok:false},{v:"4ヶ月達成", ok:true},{v:"6ヶ月連続達成", ok:false}], explain:"当該ポジションで EBPボーナス取得条件期間（毎年12月度〜翌5月度、または6月度〜11月度の各6ヶ月間）内に <b>4ヶ月達成</b> することが必要です。", cite:"概要書面 P29「EBPボーナス取得条件期間」" },
+  { id:"P05", cat:"partner", type:"choice", diff:2, q:"「ボードメンバー」の認定基準は何ですか？", choices:[{v:"年間ボーナス1,000万円以上", ok:false},{v:"日本のEOSまたはEOS台湾で3ポジション以上同時にEBP認定基準達成", ok:true},{v:"グループ内にBPが30名以上", ok:false},{v:"ABP認定から3年経過", ok:false}], explain:"日本のEOSまたはEOS台湾で <b>3ポジション以上同時に EBP認定基準</b> を達成すること（EBPカウント中のポジションは含みません）。", cite:"概要書面 P30「ボードメンバー認定基準」" },
+  { id:"P06", cat:"partner", type:"numerical", diff:3, unit:"ヶ月", q:"ワールドボーナス取得条件期間における「前年度12月度〜11月度（12ヶ月間）」のうち、何ヶ月間条件を達成する必要がありますか？", accept:[9], explain:"前年の12月度〜11月度の12ヶ月間で、ワールドボーナス取得条件（メインボーナス組織の左右にABPボーナス取得者・または左右とも単月480万BV等）を <b>9ヶ月達成</b> することが必要です。", cite:"概要書面 P31「ワールドボーナス · 取得条件」" },
+  { id:"P07", cat:"partner", type:"choice", diff:3, q:"ABPボーナス（総BP × 2%）を取得するための条件IIの一例として正しいのはどれ？", choices:[{v:"当該ポジションでBPボーナスを取得し、メインボーナス組織(左右)が単月480万BV以上", ok:true},{v:"当該月だけでアクティブボーナス1口のみを取得", ok:false},{v:"全グループから1ポジションあたり8,000PV以上", ok:false},{v:"紹介者系列組織に10系列以上のBP", ok:false}], explain:"条件IIの例として、(1)当該ポジションで BPボーナスを取得、(2)メインボーナス組織（バイナリー系列）の左右が <b>単月480万BV以上</b> などを満たす必要があります。", cite:"概要書面 P28「ABPボーナス · 条件II」" },
+  { id:"P08", cat:"partner", type:"choice", diff:2, q:"ワールドボーナスの配分率と支払い頻度は？", choices:[{v:"年間BVの0.2% ／ 年1回（11月度）", ok:true},{v:"年間BVの2% ／ 年2回", ok:false},{v:"年間BVの5% ／ 年4回", ok:false},{v:"月間BPの0.2% ／ 月1回", ok:false}], explain:"前年度実績（12月度〜翌11月度）の総ビジネスポイントの <b>0.2%</b> を、ワールドボーナス取得権利者で均等分配し、 <b>年1回（11月度）</b> まとめてお支払いします。", cite:"概要書面 P31「ワールドボーナス · ボーナス内容」" },
+  { id:"P09", cat:"partner", type:"numerical", diff:3, unit:"名", q:"アクティブボーナス取得条件「直接紹介した会員のうち、アクティブボーナス取得者が2名以上」。<br>条件を満たす最小人数は？", accept:[2], explain:"自らがアクティブボーナスを取得し、かつ直接紹介した会員のうち <b>2名以上</b> のアクティブボーナス取得者がいることが条件です。", cite:"概要書面 P17「アクティブボーナス取得条件」" },
+  { id:"P10", cat:"partner", type:"choice", diff:3, q:"スターメンバーボーナスの取得条件「紹介者系列組織（スポンサー系列）内で2系列以上に〇名以上」——〇に入る数字は？", choices:[{v:"1名", ok:false},{v:"2名", ok:false},{v:"3名", ok:true},{v:"5名", ok:false}], explain:"自らがアクティブボーナスを取得し、紹介者系列組織(スポンサー系列)内で <b>2系列以上に3名以上</b> のアクティブボーナス取得者がいることが条件です。", cite:"概要書面 P21「スターメンバーボーナス · 取得条件」" }
+];
+
+const state = { answers:{}, mode:"browse", currentList:[], currentIdx:0, streak:0, maxStreak:0, editorIndex:0 };
+const el = id => document.getElementById(id);
+const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+const categoryName = key => (CATEGORIES.find(item => item.key === key) || {}).name || key;
+const categoryPrefix = { terms:"T", basic:"B", calc:"C", partner:"P" };
+
+function deepCopy(value){ return JSON.parse(JSON.stringify(value)); }
+function clampDiff(value){ return Math.max(1, Math.min(3, Number(value) || 1)); }
+function makeNextId(cat){
+  const prefix = categoryPrefix[cat] || "Q";
+  let max = 0;
+  QUESTIONS.forEach(q => {
+    const matched = String(q.id || "").match(new RegExp(`^${prefix}(\\d+)$`));
+    if(matched) max = Math.max(max, Number(matched[1]));
+  });
+  return `${prefix}${String(max + 1).padStart(2, "0")}`;
+}
+
+function normalizeChoiceQuestion(raw){
+  const choices = Array.isArray(raw.choices) ? raw.choices.map(choice => ({ v:String(choice.v ?? "").trim(), ok:Boolean(choice.ok) })) : [];
+  const cleaned = choices.filter(choice => choice.v !== "");
+  while(cleaned.length < 2){ cleaned.push({ v:`選択肢${cleaned.length + 1}`, ok:cleaned.length === 0 }); }
+  if(!cleaned.some(choice => choice.ok)){ cleaned[0].ok = true; }
+  let found = false;
+  cleaned.forEach(choice => {
+    if(choice.ok && !found){ found = true; }
+    else if(choice.ok && found){ choice.ok = false; }
+  });
+  return cleaned;
+}
+
+function normalizeNumericalQuestion(raw){
+  const values = Array.isArray(raw.accept)
+    ? raw.accept.map(Number).filter(value => Number.isFinite(value))
+    : String(raw.accept ?? "").split(",").map(item => Number(item.trim())).filter(value => Number.isFinite(value));
+  return values.length ? values : [0];
+}
+
+function normalizeQuestion(raw, fallbackId, usedIds = new Set()){
+  const cat = CATEGORIES.some(item => item.key === raw.cat) ? raw.cat : "basic";
+  const type = raw.type === "numerical" ? "numerical" : "choice";
+  let id = String(raw.id || fallbackId || makeNextId(cat)).trim() || makeNextId(cat);
+  while(usedIds.has(id)){ id = `${id}-copy`; }
+  usedIds.add(id);
+  const base = {
+    id,
+    cat,
+    type,
+    diff: clampDiff(raw.diff),
+    q: String(raw.q ?? "").trim(),
+    ctx: String(raw.ctx ?? "").trim(),
+    unit: String(raw.unit ?? "").trim(),
+    explain: String(raw.explain ?? "").trim(),
+    cite: String(raw.cite ?? "").trim()
+  };
+  if(type === "choice"){
+    return { ...base, choices: normalizeChoiceQuestion(raw), tolerance: undefined, accept: undefined };
+  }
+  return { ...base, accept: normalizeNumericalQuestion(raw), tolerance: Number.isFinite(Number(raw.tolerance)) ? Number(raw.tolerance) : 0, choices: undefined };
+}
+
+function resetProgress(){
+  state.answers = {};
+  state.currentList = [];
+  state.currentIdx = 0;
+  state.streak = 0;
+  state.maxStreak = 0;
+  updateScore();
+}
+
+function syncCounts(){
+  el("q-total").textContent = QUESTIONS.length;
+  if(el("editor-count")) el("editor-count").textContent = `${QUESTIONS.length}問`;
+}
+
+function showSection(name){
+  el("home").classList.toggle("hidden", name !== "home");
+  el("quiz").classList.toggle("hidden", name !== "quiz");
+  el("editor").classList.toggle("hidden", name !== "editor");
+}
+
+function renderCategories(){
+  const grid = el("cat-grid");
+  grid.innerHTML = "";
+  CATEGORIES.forEach(cat => {
+    const count = QUESTIONS.filter(question => question.cat === cat.key).length;
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = "cat-card";
+    card.innerHTML = `<div class="cat-num">${cat.icon}</div><div class="cat-name">${cat.name}</div><div class="cat-desc">${cat.desc}</div><div class="cat-stat">問題数 ${count} 問</div>`;
+    card.addEventListener("click", () => startCategory(cat.key));
+    grid.appendChild(card);
+  });
+}
+
+function startCategory(catKey){
+  state.currentList = QUESTIONS.filter(question => question.cat === catKey).map(question => question.id);
+  state.currentIdx = 0;
+  switchMode("sequential");
+}
+
+function getCurrentQuestion(){
+  const id = state.currentList[state.currentIdx];
+  return QUESTIONS.find(question => question.id === id) || null;
+}
+
+function renderEmptyQuestion(message){
+  el("q-card").innerHTML = `<div class="q-text">${message}</div><div class="actions"><button class="btn primary" id="empty-back">問題一覧に戻る</button></div>`;
+  el("q-position").textContent = "— / —";
+  el("empty-back").onclick = () => switchMode("browse");
+}
+
+function renderResult(question, answer){
+  const correctChoice = question.type === "choice" ? (question.choices.find(choice => choice.ok) || {}).v || "—" : question.accept[0].toLocaleString();
+  const userChoice = answer.choiceIndex !== undefined && answer.choiceIndex >= 0 && question.choices?.[answer.choiceIndex]
+    ? question.choices[answer.choiceIndex].v
+    : "未回答";
+  const userValue = answer.value !== undefined && answer.value !== null ? Number(answer.value).toLocaleString() : "未回答";
+  const hintOnly = Boolean(answer.hintOnly) && !answer.userAnswered;
+  const ok = Boolean(answer.ok) && answer.userAnswered;
+  return `<div class="result ${hintOnly ? "" : (ok ? "good" : "bad")}">
+    <div class="result-head">
+      <span class="icon">${hintOnly ? "ℹ" : (ok ? "○" : "×")}</span>
+      <span>${hintOnly ? "解説を表示中" : (ok ? "正解です" : "不正解")}</span>
+    </div>
+    <div class="result-body">
+      ${question.type === "numerical"
+        ? `あなたの回答： <span class="answer-num">${userValue}</span> ${question.unit || ""}　／　正解： <span class="answer-num">${question.accept[0].toLocaleString()}</span> ${question.unit || ""}`
+        : `あなたの回答： <b>${userChoice}</b>　／　正解： <b>${correctChoice}</b>`}
+      <div style="margin-top:10px"><b>解説：</b>${question.explain || "解説未入力"}</div>
+      <div class="citation"><b>出典：</b>${question.cite || "出典未入力"}</div>
+    </div>
+  </div>`;
+}
+
+function renderQuestion(){
+  const question = getCurrentQuestion();
+  if(!question){
+    renderEmptyQuestion("表示できる問題がありません。問題一覧から選ぶか、編集タブで問題を追加してください。");
+    return;
+  }
+  const answer = state.answers[question.id] || {};
+  const showResult = Boolean(answer.evaluated);
+  el("q-position").textContent = `${state.currentIdx + 1} / ${state.currentList.length}`;
+  let html = `<div class="q-meta"><span class="badge">${categoryName(question.cat)}</span><span class="badge ${question.type === "numerical" ? "calc" : "choice"}">${question.type === "numerical" ? "CALC" : "CHOICE"}</span><span class="q-num">№ ${question.id}</span><span class="q-difficulty">${"<i class=\"" + (question.diff >= 1 ? "on" : "") + "\"></i><i class=\"" + (question.diff >= 2 ? "on" : "") + "\"></i><i class=\"" + (question.diff >= 3 ? "on" : "") + "\"></i>"}</span></div>`;
+  html += `<div class="q-text">${question.q || "問題文未入力"}</div>`;
+  if(question.ctx){ html += `<div class="q-context">${question.ctx}</div>`; }
+  if(question.type === "choice"){
+    html += `<div class="answers"><div class="choice-list">`;
+    question.choices.forEach((choice, index) => {
+      const selected = answer.choiceIndex === index ? "selected" : "";
+      html += `<label class="choice ${selected}" data-idx="${index}"><span class="mark">${String.fromCharCode(65 + index)}</span><span>${choice.v}</span></label>`;
+    });
+    html += `</div></div>`;
+  } else {
+    const value = answer.value !== undefined && answer.value !== null ? answer.value : "";
+    html += `<div class="answers"><div class="calc"><input type="number" inputmode="numeric" class="calc-input" id="calc-in" value="${value}" placeholder="0" autofocus><span class="calc-unit">${question.unit || ""}</span></div><div class="calc-hint">※ カンマなしの整数で入力してください。例：<b>${(question.accept[0] || 0).toLocaleString()}</b></div></div>`;
+  }
+  if(showResult){ html += renderResult(question, answer); }
+  html += `<div class="actions"><button class="btn primary" id="btn-submit">${showResult ? "再判定" : "答え合わせ"}</button><button class="btn" id="btn-clear">クリア</button><button class="btn ghost" id="btn-hint">解説を表示</button></div>`;
+  el("q-card").innerHTML = html;
+  bindQuestionEvents(question);
+}
+
+function bindQuestionEvents(question){
+  if(question.type === "choice"){
+    document.querySelectorAll(".choice").forEach(node => {
+      node.addEventListener("click", () => {
+        document.querySelectorAll(".choice").forEach(item => item.classList.remove("selected"));
+        node.classList.add("selected");
+      });
+    });
+  }
+  el("btn-submit").onclick = () => onSubmit(question);
+  el("btn-clear").onclick = () => {
+    delete state.answers[question.id];
+    state.streak = 0;
+    updateScore();
+    renderQuestion();
+  };
+  el("btn-hint").onclick = () => showExplanationOnly(question);
+  if(question.type === "numerical"){
+    const input = el("calc-in");
+    if(input){
+      input.addEventListener("keydown", event => {
+        if(event.key === "Enter"){ event.preventDefault(); onSubmit(question); }
+        if(event.key === "Escape"){ event.preventDefault(); el("btn-clear").click(); }
+      });
+    }
+  }
+}
+
+function showExplanationOnly(question){
+  const previous = state.answers[question.id] || {};
+  state.answers[question.id] = { ...previous, evaluated:true, hintOnly:true, userAnswered:Boolean(previous.userAnswered), ok:Boolean(previous.ok) };
+  renderQuestion();
+}
+
+function onSubmit(question){
+  let answer = { evaluated:true, hintOnly:false, userAnswered:true };
+  if(question.type === "choice"){
+    const selected = document.querySelector(".choice.selected");
+    if(!selected){ toast("選択肢を選んでください"); return; }
+    const index = Number(selected.dataset.idx);
+    answer.choiceIndex = index;
+    answer.ok = Boolean(question.choices[index] && question.choices[index].ok);
+  } else {
+    const input = el("calc-in");
+    if(!input){ return; }
+    const value = Number(String(input.value).replace(/,/g, ""));
+    if(!Number.isFinite(value)){ toast("数値を入力してください"); return; }
+    answer.value = value;
+    const tolerance = Number(question.tolerance) || 0;
+    answer.ok = question.accept.some(target => Math.abs(value - Number(target)) <= tolerance);
+  }
+  state.answers[question.id] = answer;
+  state.streak = answer.ok ? state.streak + 1 : 0;
+  state.maxStreak = Math.max(state.maxStreak, state.streak);
+  updateScore();
+  renderQuestion();
+}
+
+function updateScore(){
+  const answered = Object.values(state.answers).filter(answer => answer.userAnswered);
+  const correct = answered.filter(answer => answer.ok).length;
+  el("s-answered").textContent = answered.length;
+  el("s-correct").textContent = correct;
+  el("s-rate").textContent = answered.length ? `${Math.round((correct / answered.length) * 100)}%` : "—";
+  el("s-streak").textContent = state.streak;
+}
+
+function toast(message){
+  const node = document.createElement("div");
+  node.className = "toast";
+  node.textContent = message;
+  document.body.appendChild(node);
+  setTimeout(() => {
+    node.style.transition = "opacity .3s";
+    node.style.opacity = 0;
+    setTimeout(() => node.remove(), 300);
+  }, 1500);
+}
+
+function switchMode(mode){
+  state.mode = mode;
+  document.querySelectorAll("#modes button").forEach(button => button.classList.toggle("active", button.dataset.mode === mode));
+  if(mode === "browse"){
+    showSection("home");
+    renderCategories();
+    return;
+  }
+  if(mode === "sequential"){
+    if(!state.currentList.length){ state.currentList = QUESTIONS.map(question => question.id); state.currentIdx = 0; }
+    showSection("quiz");
+    renderQuestion();
+    return;
+  }
+  if(mode === "review"){
+    const wrong = Object.entries(state.answers).filter(([, answer]) => answer.userAnswered && !answer.ok).map(([id]) => id);
+    if(!wrong.length){ toast("誤答がありません。全問正解です！"); showSection("home"); return; }
+    state.currentList = wrong;
+    state.currentIdx = 0;
+    showSection("quiz");
+    renderQuestion();
+    return;
+  }
+  if(mode === "editor"){
+    showSection("editor");
+    renderEditor();
+  }
+}
+
+function goNext(){
+  if(state.currentIdx < state.currentList.length - 1){ state.currentIdx += 1; renderQuestion(); }
+  else { toast("最終問題です。お疲れさまでした。"); }
+}
+function goPrev(){
+  if(state.currentIdx > 0){ state.currentIdx -= 1; renderQuestion(); }
+  else { toast("最初の問題です。"); }
+}
+
+function renderEditorList(){
+  const list = el("editor-list");
+  list.innerHTML = QUESTIONS.map((question, index) => `
+    <button type="button" class="editor-item ${index === state.editorIndex ? "active" : ""}" data-index="${index}">
+      <div class="editor-item-id">${escapeHtml(question.id)}</div>
+      <div class="editor-item-title">${escapeHtml((question.q || "問題文未入力").replace(/<br\s*\/?>/g, " ").slice(0, 72))}</div>
+      <div class="editor-item-meta"><span>${escapeHtml(categoryName(question.cat))}</span><span>${question.type === "numerical" ? "数値入力" : "選択式"}</span><span>難易度 ${question.diff}</span></div>
+    </button>
+  `).join("");
+}
+
+function renderChoiceRows(choices){
+  const container = el("editor-choice-rows");
+  container.innerHTML = choices.map((choice, index) => `
+    <div class="editor-choice-row">
+      <label class="editor-choice-correct"><input type="radio" name="editor-correct" value="${index}" ${choice.ok ? "checked" : ""}></label>
+      <input type="text" class="editor-choice-text" value="${escapeHtml(choice.v)}" placeholder="選択肢${index + 1}">
+      <button type="button" class="btn ghost editor-choice-remove">削除</button>
+    </div>
+  `).join("");
+}
+
+function toggleEditorPanels(){
+  const isChoice = el("editor-type").value === "choice";
+  el("editor-choice-panel").classList.toggle("hidden", !isChoice);
+  el("editor-numerical-panel").classList.toggle("hidden", isChoice);
+}
+
+function loadQuestionToEditor(index){
+  if(!QUESTIONS[index]) return;
+  state.editorIndex = index;
+  const question = QUESTIONS[index];
+  el("editor-current-title").textContent = `${question.id} を編集`;
+  el("editor-id").value = question.id || "";
+  el("editor-cat").value = question.cat || "basic";
+  el("editor-type").value = question.type || "choice";
+  el("editor-diff").value = clampDiff(question.diff);
+  el("editor-unit").value = question.unit || "";
+  el("editor-tolerance").value = question.tolerance ?? 0;
+  el("editor-q").value = question.q || "";
+  el("editor-ctx").value = question.ctx || "";
+  el("editor-explain").value = question.explain || "";
+  el("editor-cite").value = question.cite || "";
+  el("editor-accept").value = Array.isArray(question.accept) ? question.accept.join(",") : "";
+  renderChoiceRows(question.choices || [{ v:"選択肢1", ok:true }, { v:"選択肢2", ok:false }]);
+  toggleEditorPanels();
+  renderEditorList();
+}
+
+function renderEditor(){
+  syncCounts();
+  if(state.editorIndex >= QUESTIONS.length) state.editorIndex = QUESTIONS.length - 1;
+  if(state.editorIndex < 0) state.editorIndex = 0;
+  renderEditorList();
+  loadQuestionToEditor(state.editorIndex);
+}
+
+function addChoiceRow(choice = { v:"", ok:false }){
+  const rows = Array.from(document.querySelectorAll("#editor-choice-rows .editor-choice-row")).map((row, index) => ({
+    v: row.querySelector(".editor-choice-text").value,
+    ok: row.querySelector("input[type='radio']").checked,
+    index
+  }));
+  rows.push({ v: choice.v, ok: choice.ok });
+  renderChoiceRows(rows);
+}
+
+function collectEditorQuestion(){
+  const current = QUESTIONS[state.editorIndex] || {};
+  const type = el("editor-type").value;
+  const cat = el("editor-cat").value;
+  const raw = {
+    id: el("editor-id").value.trim() || current.id || makeNextId(cat),
+    cat,
+    type,
+    diff: clampDiff(el("editor-diff").value),
+    unit: el("editor-unit").value.trim(),
+    q: el("editor-q").value.trim(),
+    ctx: el("editor-ctx").value.trim(),
+    explain: el("editor-explain").value.trim(),
+    cite: el("editor-cite").value.trim(),
+    tolerance: Number(el("editor-tolerance").value || 0)
+  };
+  if(!raw.q) throw new Error("問題文を入力してください");
+  if(type === "choice"){
+    raw.choices = Array.from(document.querySelectorAll("#editor-choice-rows .editor-choice-row")).map(row => ({
+      v: row.querySelector(".editor-choice-text").value.trim(),
+      ok: row.querySelector("input[type='radio']").checked
+    }));
+    const cleaned = raw.choices.filter(choice => choice.v !== "");
+    if(cleaned.length < 2) throw new Error("選択肢は2つ以上必要です");
+    if(!cleaned.some(choice => choice.ok)) cleaned[0].ok = true;
+    raw.choices = cleaned;
+  } else {
+    const values = el("editor-accept").value.split(",").map(item => Number(item.trim())).filter(value => Number.isFinite(value));
+    if(!values.length) throw new Error("数値問題の正解値を入力してください");
+    raw.accept = values;
+  }
+  return raw;
+}
+
+function saveEditorQuestion(options = {}){
+  try {
+    const current = QUESTIONS[state.editorIndex] || {};
+    const usedIds = new Set(QUESTIONS.filter((_, index) => index !== state.editorIndex).map(question => question.id));
+    const updated = normalizeQuestion(collectEditorQuestion(), current.id, usedIds);
+    if(QUESTIONS.some((question, index) => index !== state.editorIndex && question.id === updated.id)){
+      throw new Error("問題IDが重複しています");
+    }
+    const oldId = current.id;
+    QUESTIONS[state.editorIndex] = updated;
+    if(oldId && oldId !== updated.id){ delete state.answers[oldId]; }
+    syncCounts();
+    renderCategories();
+    renderEditor();
+    if(!options.silent) toast("保存しました");
+    return true;
+  } catch (error) {
+    toast(error.message || "保存できませんでした");
+    return false;
+  }
+}
+
+function addNewQuestion(type){
+  const cat = type === "numerical" ? "calc" : "basic";
+  const question = normalizeQuestion(type === "numerical"
+    ? { id: makeNextId(cat), cat, type, diff:1, unit:"円", q:"新しい計算問題", ctx:"", accept:[0], tolerance:0, explain:"解説を入力してください", cite:"出典を入力してください" }
+    : { id: makeNextId(cat), cat, type, diff:1, q:"新しい選択問題", ctx:"", choices:[{v:"選択肢1", ok:true},{v:"選択肢2", ok:false}], explain:"解説を入力してください", cite:"出典を入力してください" }, makeNextId(cat));
+  QUESTIONS.push(question);
+  state.editorIndex = QUESTIONS.length - 1;
+  syncCounts();
+  renderCategories();
+  switchMode("editor");
+  toast("新しい問題を追加しました");
+}
+
+function duplicateCurrentQuestion(){
+  const current = QUESTIONS[state.editorIndex];
+  if(!current) return;
+  const clone = deepCopy(current);
+  clone.id = makeNextId(clone.cat);
+  QUESTIONS.splice(state.editorIndex + 1, 0, clone);
+  state.editorIndex += 1;
+  syncCounts();
+  renderCategories();
+  renderEditor();
+  toast("複製しました");
+}
+
+function deleteCurrentQuestion(){
+  if(QUESTIONS.length <= 1){ toast("最後の1問は削除できません"); return; }
+  const current = QUESTIONS[state.editorIndex];
+  if(!current) return;
+  if(!window.confirm(`問題 ${current.id} を削除しますか？`)) return;
+  delete state.answers[current.id];
+  QUESTIONS.splice(state.editorIndex, 1);
+  state.editorIndex = Math.max(0, state.editorIndex - 1);
+  syncCounts();
+  renderCategories();
+  renderEditor();
+  updateScore();
+  toast("削除しました");
+}
+
+function previewCurrentQuestion(){
+  if(!saveEditorQuestion({ silent:true })) return;
+  const current = QUESTIONS[state.editorIndex];
+  state.currentList = [current.id];
+  state.currentIdx = 0;
+  switchMode("sequential");
+  toast("プレビュー表示に切り替えました");
+}
+
+function exportQuestionsToTextarea(){
+  el("editor-json").value = JSON.stringify(QUESTIONS, null, 2);
+  toast("JSONを表示しました");
+}
+
+function importQuestionsArray(parsed, successMessage){
+  if(!Array.isArray(parsed) || !parsed.length){ throw new Error("1問以上のデータを入力してください"); }
+  const usedIds = new Set();
+  const normalized = parsed.map((item, index) => normalizeQuestion(item, `${categoryPrefix[item?.cat] || "Q"}${String(index + 1).padStart(2, "0")}`, usedIds));
+  QUESTIONS.splice(0, QUESTIONS.length, ...normalized);
+  state.editorIndex = 0;
+  resetProgress();
+  syncCounts();
+  renderCategories();
+  renderEditor();
+  toast(successMessage);
+}
+
+function replaceQuestionsFromJson(text){
+  try {
+    const parsed = JSON.parse(text);
+    importQuestionsArray(parsed, "JSONを読み込みました");
+  } catch (error) {
+    toast(error.message || "JSONを読み込めませんでした");
+  }
+}
+
+function parseCsv(text){
+  const rows = [];
+  let row = [];
+  let field = "";
+  let inQuotes = false;
+  for(let i = 0; i < text.length; i += 1){
+    const char = text[i];
+    const next = text[i + 1];
+    if(inQuotes){
+      if(char === '"' && next === '"'){ field += '"'; i += 1; }
+      else if(char === '"'){ inQuotes = false; }
+      else { field += char; }
+    } else {
+      if(char === '"'){ inQuotes = true; }
+      else if(char === ','){ row.push(field); field = ""; }
+      else if(char === '\n'){
+        row.push(field); field = "";
+        if(row.some(cell => String(cell).trim() !== "")){ rows.push(row); }
+        row = [];
+      } else if(char === '\r') {
+        continue;
+      } else {
+        field += char;
+      }
+    }
+  }
+  row.push(field);
+  if(row.some(cell => String(cell).trim() !== "")){ rows.push(row); }
+  return rows;
+}
+
+function getCsvTemplate(){
+  return [
+    'id,cat,type,diff,q,ctx,unit,tolerance,accept,choice1,choice2,choice3,choice4,correct,explain,cite',
+    'T01,terms,choice,1,PVとは何を指す用語ですか？,,, , ,購入に対するポイント,メインボーナスだけに使うポイント,年間累計ボーナス,登録費用,1,PVは購入に対するポイントです。,概要書面 用語解説',
+    'C99,calc,numerical,2,アクティブボーナスを2口取得した場合の金額は？,1口=2400円,円,0,4800,,,,, ,2,400円×2=4,800円です。,概要書面 P17'
+  ].join('\n');
+}
+
+function csvEscape(value){
+  const text = String(value ?? '');
+  return /[",\n\r]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+}
+
+function questionsToCsv(){
+  const headers = ['id','cat','type','diff','q','ctx','unit','tolerance','accept','choice1','choice2','choice3','choice4','correct','explain','cite'];
+  const rows = [headers];
+  QUESTIONS.forEach(question => {
+    const choices = question.choices || [];
+    const correctIndex = choices.findIndex(choice => choice.ok);
+    rows.push([
+      question.id || '',
+      question.cat || '',
+      question.type || 'choice',
+      question.diff ?? '',
+      question.q || '',
+      question.ctx || '',
+      question.unit || '',
+      question.type === 'numerical' ? (question.tolerance ?? 0) : '',
+      question.type === 'numerical' ? (question.accept || []).join(',') : '',
+      choices[0]?.v || '',
+      choices[1]?.v || '',
+      choices[2]?.v || '',
+      choices[3]?.v || '',
+      correctIndex >= 0 ? String(correctIndex + 1) : '',
+      question.explain || '',
+      question.cite || ''
+    ]);
+  });
+  return rows.map(row => row.map(csvEscape).join(',')).join('\n');
+}
+
+function exportQuestionsToCsvTextarea(){
+  el('editor-csv').value = questionsToCsv();
+  toast('CSVを表示しました');
+}
+
+function downloadQuestionsCsv(){
+  const blob = new Blob([questionsToCsv()], { type:'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'eos-questions.csv';
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+function replaceQuestionsFromCsv(text){
+  try {
+    const rows = parseCsv(text.trim());
+    if(rows.length < 2){ throw new Error("見出し行を含むCSVを貼り付けてください"); }
+    const headers = rows[0].map(header => String(header).trim().toLowerCase());
+    const choiceIndexes = headers.map((header, index) => ({ header, index })).filter(item => /^choice\d+$/i.test(item.header));
+    if(!headers.includes('q')){ throw new Error("CSVに q 列（問題文）が必要です"); }
+    const items = rows.slice(1).map((cells, rowIndex) => {
+      const get = key => {
+        const index = headers.indexOf(key);
+        return index >= 0 ? String(cells[index] ?? "").trim() : "";
+      };
+      const type = get('type') === 'numerical' ? 'numerical' : 'choice';
+      const item = {
+        id: get('id') || undefined,
+        cat: get('cat') || 'basic',
+        type,
+        diff: get('diff') || 1,
+        q: get('q'),
+        ctx: get('ctx'),
+        unit: get('unit'),
+        tolerance: get('tolerance'),
+        explain: get('explain'),
+        cite: get('cite')
+      };
+      if(type === 'numerical'){
+        item.accept = get('accept').split(/[|,]/).map(v => Number(v.trim())).filter(v => Number.isFinite(v));
+      } else {
+        const choices = choiceIndexes.map(({ index }) => String(cells[index] ?? "").trim()).filter(Boolean);
+        if(choices.length < 2){ throw new Error(`${rowIndex + 2}行目: 選択式は choice1 以降を2つ以上入力してください`); }
+        const correctRaw = get('correct');
+        let correctIndex = Number(correctRaw) - 1;
+        if(!Number.isInteger(correctIndex) || correctIndex < 0 || correctIndex >= choices.length){
+          const alpha = correctRaw.toUpperCase();
+          if(/^[A-Z]$/.test(alpha)){ correctIndex = alpha.charCodeAt(0) - 65; }
+        }
+        if(!Number.isInteger(correctIndex) || correctIndex < 0 || correctIndex >= choices.length){
+          correctIndex = choices.findIndex(choice => choice === correctRaw);
+        }
+        if(correctIndex < 0){ correctIndex = 0; }
+        item.choices = choices.map((choice, index) => ({ v: choice, ok: index === correctIndex }));
+      }
+      return item;
+    });
+    importQuestionsArray(items, "CSVを読み込みました");
+  } catch (error) {
+    toast(error.message || "CSVを読み込めませんでした");
+  }
+}
+
+function downloadQuestionsJson(){
+  const blob = new Blob([JSON.stringify(QUESTIONS, null, 2)], { type:"application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "eos-questions.json";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  syncCounts();
+  renderCategories();
+  renderEditor();
+  updateScore();
+
+  document.querySelectorAll("#modes button").forEach(button => button.addEventListener("click", () => switchMode(button.dataset.mode)));
+  el("btn-next").addEventListener("click", goNext);
+  el("btn-prev").addEventListener("click", goPrev);
+  el("editor-add-choice-question").addEventListener("click", () => addNewQuestion("choice"));
+  el("editor-add-numerical-question").addEventListener("click", () => addNewQuestion("numerical"));
+  el("editor-duplicate").addEventListener("click", duplicateCurrentQuestion);
+  el("editor-delete").addEventListener("click", deleteCurrentQuestion);
+  el("editor-preview").addEventListener("click", previewCurrentQuestion);
+  el("editor-save").addEventListener("click", () => saveEditorQuestion());
+  el("editor-reset").addEventListener("click", () => loadQuestionToEditor(state.editorIndex));
+  el("editor-export").addEventListener("click", exportQuestionsToTextarea);
+  el("editor-download").addEventListener("click", downloadQuestionsJson);
+  el("editor-import").addEventListener("click", () => replaceQuestionsFromJson(el("editor-json").value));
+  el("editor-csv-export").addEventListener("click", exportQuestionsToCsvTextarea);
+  el("editor-csv-download").addEventListener("click", downloadQuestionsCsv);
+  el("editor-csv-template").addEventListener("click", () => { el("editor-csv").value = getCsvTemplate(); toast("CSVテンプレートを表示しました"); });
+  el("editor-csv-import").addEventListener("click", () => replaceQuestionsFromCsv(el("editor-csv").value));
+  el("editor-type").addEventListener("change", toggleEditorPanels);
+  el("editor-add-option").addEventListener("click", () => addChoiceRow({ v:`選択肢${document.querySelectorAll('#editor-choice-rows .editor-choice-row').length + 1}`, ok:false }));
+
+  el("editor-list").addEventListener("click", event => {
+    const button = event.target.closest(".editor-item");
+    if(!button) return;
+    loadQuestionToEditor(Number(button.dataset.index));
+  });
+
+  el("editor-choice-rows").addEventListener("click", event => {
+    const removeButton = event.target.closest(".editor-choice-remove");
+    if(!removeButton) return;
+    const rows = document.querySelectorAll("#editor-choice-rows .editor-choice-row");
+    if(rows.length <= 2){ toast("選択肢は2つ以上必要です"); return; }
+    removeButton.closest(".editor-choice-row").remove();
+    const radios = Array.from(document.querySelectorAll("#editor-choice-rows input[type='radio']"));
+    if(radios.length && !radios.some(radio => radio.checked)){ radios[0].checked = true; }
+  });
+
+  el("editor-file").addEventListener("change", event => {
+    const file = event.target.files && event.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      el("editor-json").value = String(reader.result || "");
+      replaceQuestionsFromJson(el("editor-json").value);
+      event.target.value = "";
+    };
+    reader.readAsText(file, "utf-8");
+  });
+
+  el("editor-csv-file").addEventListener("change", event => {
+    const file = event.target.files && event.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      el("editor-csv").value = String(reader.result || "");
+      replaceQuestionsFromCsv(el("editor-csv").value);
+      event.target.value = "";
+    };
+    reader.readAsText(file, "utf-8");
+  });
+
+  document.addEventListener("keydown", event => {
+    if(event.target.tagName === "INPUT" || event.target.tagName === "TEXTAREA" || event.target.tagName === "SELECT") return;
+    if(state.mode === "sequential" && event.key === "ArrowRight") goNext();
+    if(state.mode === "sequential" && event.key === "ArrowLeft") goPrev();
+  });
+
+  switchMode("browse");
+});
+</script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925" integrity="sha512-d9sL6GJLXn6fInD1+TVXhTcQOsmxeHfmHAvwGDIxp5TO+uo1fiWW7mHomMj4MLRlCsJDTqXzWLHJFFlPCEIj/A==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79"}' crossorigin="anonymous"></script>
+</body>
+</html>
