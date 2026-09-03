@@ -55,7 +55,7 @@
         <div class="subpanel" id="choice-panel"><h4>選択肢</h4><div class="choice-rows" id="choice-rows"></div><div class="form-actions" style="margin-top:12px"><button class="btn" id="add-option">選択肢を追加</button></div><div class="help">左のラジオで正解を選びます。最低2個の選択肢が必要です。</div></div>
         <div class="subpanel hidden" id="numerical-panel"><h4>数値問題の正解設定</h4><div class="field full"><label for="qaccept">正解値（複数なら | 区切り）</label><input id="qaccept" type="text" placeholder="例: 7200 または 16666|16667"></div></div>
         <div class="form-grid" style="margin-top:16px"><div class="field full"><label for="qexplain">解説</label><textarea id="qexplain"></textarea></div><div class="field full"><label for="qcite">出典</label><textarea id="qcite"></textarea></div></div>
-        <div class="form-actions" style="margin-top:18px"><button class="btn primary" id="save-question">この問題を保存</button><button class="btn" id="reset-question">フォームを元に戻す</button><button class="btn ghost" id="preview-csv">CSV全体を下に表示</button></div>
+        <div class="form-actions" style="margin-top:18px"><button class="btn primary" id="save-question">保存してGitHub反映</button><button class="btn" id="save-question-local">画面内だけ保存</button><button class="btn" id="reset-question">フォームを元に戻す</button><button class="btn ghost" id="preview-csv">CSV全体を下に表示</button></div>
       </div>
     </section>
   </div>
@@ -64,16 +64,66 @@
     <div class="form-body">
       <textarea id="csv-area" class="csv-area" placeholder="ここにCSVを貼り付けるか、現在のCSVを表示して編集できます"></textarea>
       <div class="csv-tools" style="margin-top:14px"><button class="btn" id="import-csv">このCSVで置き換える</button><button class="btn" id="show-template">テンプレート表示</button><input id="csv-file" type="file" accept="text/csv,.csv"></div>
-      <div class="inline-note">列は <code>id,cat,type,diff,q,ctx,unit,tolerance,accept,choice1,choice2,choice3,choice4,correct,explain,cite</code> を使用します。<br>更新後は <b>questions.csv をダウンロード → GitHub上で questions.csv を上書き</b> すれば、同じ公開URLの内容が最新版に変わります。</div>
+      <div class="inline-note">列は <code>id,cat,type,diff,q,ctx,unit,tolerance,accept,choice1,choice2,choice3,choice4,correct,explain,cite</code> を使用します。<br>下のGitHub設定を入れると、<b>保存ボタンから直接 questions.csv をGitHubへ反映</b>できます。トークンはこのブラウザに保存されます。</div>
+    <div class="subpanel" style="margin-top:16px">
+      <h4>GitHub 直接反映設定</h4>
+      <div class="form-grid">
+        <div class="field"><label for="gh-owner">GitHub Owner</label><input id="gh-owner" type="text" placeholder="your-name"></div>
+        <div class="field"><label for="gh-repo">Repository</label><input id="gh-repo" type="text" placeholder="eos-study-quiz"></div>
+        <div class="field"><label for="gh-branch">Branch</label><input id="gh-branch" type="text" value="main"></div>
+        <div class="field"><label for="gh-path">更新対象パス</label><input id="gh-path" type="text" value="questions.csv"></div>
+        <div class="field full"><label for="gh-token">GitHub Personal Access Token</label><input id="gh-token" type="password" placeholder="github_pat_..."></div>
+      </div>
+      <div class="csv-tools" style="margin-top:12px"><button class="btn" id="save-gh-config">GitHub設定を保存</button><button class="btn ghost" id="test-gh-config">接続テスト</button></div>
+      <div class="help">※ GitHub Pages のURLが <code>https://ユーザー名.github.io/リポジトリ名/</code> 形式なら、Owner と Repository は自動推定されます。</div>
+    </div>
     </div>
   </section>
 </div>
 <script>
 const CATEGORY_PREFIX = { terms:'T', basic:'B', calc:'C', partner:'P' };
 const CATEGORY_NAME = { terms:'用語学習クイズ', basic:'概要書面の基本ルール', calc:'ボーナス計算ドリル', partner:'ビジネスパートナー条件' };
+const GITHUB_STORAGE_KEY = 'eos-quiz-editor-github-config-v1';
 const state = { questions:[], editorIndex:0 };
 const el = id => document.getElementById(id);
 function toast(message){ window.alert(message); }
+function inferGitHubConfig(){
+  const host = location.hostname || '';
+  const path = location.pathname || '';
+  const cfg = { owner:'', repo:'', branch:'main', path:'questions.csv', token:'' };
+  if(host.endsWith('.github.io')){
+    cfg.owner = host.split('.')[0] || '';
+    const seg = path.split('/').filter(Boolean);
+    if(seg.length >= 2) cfg.repo = seg[0];
+  }
+  return cfg;
+}
+function loadGitHubConfig(){
+  const inferred = inferGitHubConfig();
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem(GITHUB_STORAGE_KEY) || '{}'); } catch(e) { saved = {}; }
+  const config = { owner: saved.owner || inferred.owner || '', repo: saved.repo || inferred.repo || '', branch: saved.branch || 'main', path: saved.path || 'questions.csv', token: saved.token || '' };
+  el('gh-owner').value = config.owner;
+  el('gh-repo').value = config.repo;
+  el('gh-branch').value = config.branch;
+  el('gh-path').value = config.path;
+  el('gh-token').value = config.token;
+}
+function getGitHubConfig(){
+  return { owner: el('gh-owner').value.trim(), repo: el('gh-repo').value.trim(), branch: el('gh-branch').value.trim() || 'main', path: el('gh-path').value.trim() || 'questions.csv', token: el('gh-token').value.trim() };
+}
+function saveGitHubConfig(showToast = true){
+  const cfg = getGitHubConfig();
+  localStorage.setItem(GITHUB_STORAGE_KEY, JSON.stringify(cfg));
+  if(showToast) toast('GitHub設定を保存しました');
+  return cfg;
+}
+function toBase64Utf8(text){
+  const bytes = new TextEncoder().encode(text);
+  let binary = '';
+  bytes.forEach(b => binary += String.fromCharCode(b));
+  return btoa(binary);
+}
 function parseCsv(text){ const rows=[]; let row=[], field='', inQuotes=false; for(let i=0;i<text.length;i++){ const ch=text[i], nx=text[i+1]; if(inQuotes){ if(ch==='"'&&nx==='"'){ field+='"'; i++; } else if(ch==='"'){ inQuotes=false; } else { field+=ch; } } else { if(ch==='"'){ inQuotes=true; } else if(ch===','){ row.push(field); field=''; } else if(ch==='\n'){ row.push(field); if(row.some(v=>String(v).trim()!=='')) rows.push(row); row=[]; field=''; } else if(ch!=='\r'){ field+=ch; } } } row.push(field); if(row.some(v=>String(v).trim()!=='')) rows.push(row); return rows; }
 function csvEscape(value){ const text = String(value ?? ''); return /[",\n\r]/.test(text) ? `"${text.replace(/"/g,'""')}"` : text; }
 function normalizeQuestion(raw, fallbackId){ const type = raw.type === 'numerical' ? 'numerical' : 'choice'; const cat = raw.cat || 'basic'; return { id:(raw.id || fallbackId || `${CATEGORY_PREFIX[cat]||'Q'}01`).trim(), cat, type, diff:Math.max(1,Math.min(3,Number(raw.diff)||1)), q:raw.q || '', ctx:raw.ctx || '', unit:raw.unit || '', tolerance:Number(raw.tolerance || 0), explain:raw.explain || '', cite:raw.cite || '', accept:type === 'numerical' ? ((raw.accept || []).length ? raw.accept : [0]) : undefined, choices:type === 'choice' ? ((raw.choices || []).length ? raw.choices : [{v:'選択肢1',ok:true},{v:'選択肢2',ok:false}]) : undefined }; }
@@ -87,7 +137,36 @@ function togglePanels(){ const isChoice = el('qtype').value === 'choice'; el('ch
 function loadQuestion(index){ state.editorIndex=index; const q=state.questions[index]; if(!q) return; el('editor-title').textContent = `${q.id} を編集`; el('qid').value=q.id||''; el('qcat').value=q.cat||'basic'; el('qtype').value=q.type||'choice'; el('qdiff').value=q.diff||1; el('qunit').value=q.unit||''; el('qtolerance').value=q.tolerance??0; el('qq').value=q.q||''; el('qctx').value=q.ctx||''; el('qaccept').value=(q.accept||[]).join('|'); el('qexplain').value=q.explain||''; el('qcite').value=q.cite||''; renderChoiceRows(q.choices || [{v:'選択肢1',ok:true},{v:'選択肢2',ok:false}]); togglePanels(); renderList(); }
 function renderEditor(){ renderList(); loadQuestion(Math.min(state.editorIndex, Math.max(state.questions.length-1,0))); }
 function collectQuestion(){ const type=el('qtype').value; const cat=el('qcat').value; const raw={ id:el('qid').value.trim()||makeNextId(cat), cat, type, diff:el('qdiff').value, q:el('qq').value.trim(), ctx:el('qctx').value.trim(), unit:el('qunit').value.trim(), tolerance:el('qtolerance').value, explain:el('qexplain').value.trim(), cite:el('qcite').value.trim() }; if(!raw.q) throw new Error('問題文を入力してください'); if(type==='numerical'){ const vals=el('qaccept').value.split(/[|,]/).map(v=>Number(v.trim())).filter(v=>Number.isFinite(v)); if(!vals.length) throw new Error('数値問題の正解値を入力してください'); raw.accept=vals; } else { const rows=[...document.querySelectorAll('#choice-rows .choice-row')].map(row=>({ v:row.querySelector('.choice-text').value.trim(), ok:row.querySelector('input[type="radio"]').checked })).filter(choice=>choice.v); if(rows.length<2) throw new Error('選択肢は2つ以上必要です'); if(!rows.some(r=>r.ok)) rows[0].ok=true; raw.choices=rows.map((r,idx)=>({v:r.v, ok:r.ok && !rows.slice(0,idx).some(x=>x.ok)})); } return normalizeQuestion(raw, makeNextId(cat)); }
-function saveQuestion(){ try { const current=state.questions[state.editorIndex]; const updated=collectQuestion(); if(state.questions.some((q,i)=>i!==state.editorIndex && q.id===updated.id)) throw new Error('問題IDが重複しています'); state.questions[state.editorIndex]=updated; renderEditor(); toast('保存しました'); } catch (e) { toast(e.message); } }
+function saveQuestion(){ try { const current=state.questions[state.editorIndex]; const updated=collectQuestion(); if(state.questions.some((q,i)=>i!==state.editorIndex && q.id===updated.id)) throw new Error('問題IDが重複しています'); state.questions[state.editorIndex]=updated; renderEditor(); toast('画面内に保存しました'); return true; } catch (e) { toast(e.message); return false; } }
+async function pushCsvToGitHub(){
+  const cfg = saveGitHubConfig(false);
+  if(!cfg.owner || !cfg.repo || !cfg.token) throw new Error('GitHub設定（Owner / Repository / Token）を入力してください');
+  const apiUrl = `https://api.github.com/repos/${encodeURIComponent(cfg.owner)}/${encodeURIComponent(cfg.repo)}/contents/${cfg.path.split('/').map(encodeURIComponent).join('/')}`;
+  const headers = { 'Authorization': `Bearer ${cfg.token}`, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' };
+  let sha = null;
+  const getResp = await fetch(`${apiUrl}?ref=${encodeURIComponent(cfg.branch)}`, { headers });
+  if(getResp.status === 200){ sha = (await getResp.json()).sha; }
+  else if(getResp.status !== 404){ throw new Error(`GitHub取得失敗: ${getResp.status}`); }
+  const payload = { message: 'Update questions.csv from editor.html', content: toBase64Utf8(questionsToCsv()), branch: cfg.branch };
+  if(sha) payload.sha = sha;
+  const putResp = await fetch(apiUrl, { method:'PUT', headers, body: JSON.stringify(payload) });
+  if(!putResp.ok){ const text = await putResp.text(); throw new Error(`GitHub更新失敗: ${putResp.status} ${text}`); }
+  toast('GitHubの questions.csv を更新しました');
+}
+async function saveAndPushQuestion(){
+  if(!saveQuestion()) return;
+  await pushCsvToGitHub();
+}
+async function testGitHubConfig(){
+  try {
+    const cfg = saveGitHubConfig(false);
+    if(!cfg.owner || !cfg.repo || !cfg.token) throw new Error('GitHub設定（Owner / Repository / Token）を入力してください');
+    const apiUrl = `https://api.github.com/repos/${encodeURIComponent(cfg.owner)}/${encodeURIComponent(cfg.repo)}/contents/${cfg.path.split('/').map(encodeURIComponent).join('/')}?ref=${encodeURIComponent(cfg.branch)}`;
+    const resp = await fetch(apiUrl, { headers: { 'Authorization': `Bearer ${cfg.token}`, 'Accept': 'application/vnd.github+json' } });
+    if(resp.status === 200 || resp.status === 404){ toast('接続テストOKです'); return; }
+    throw new Error(`接続テスト失敗: ${resp.status}`);
+  } catch (e) { toast(e.message); }
+}
 function addQuestion(type){ const cat = type==='numerical' ? 'calc' : 'basic'; state.questions.push(normalizeQuestion(type==='numerical'?{id:makeNextId(cat),cat,type,diff:1,q:'新しい計算問題',unit:'円',accept:[0],tolerance:0,explain:'解説を入力してください',cite:'出典を入力してください'}:{id:makeNextId(cat),cat,type,diff:1,q:'新しい選択問題',choices:[{v:'選択肢1',ok:true},{v:'選択肢2',ok:false}],explain:'解説を入力してください',cite:'出典を入力してください'}, makeNextId(cat))); state.editorIndex=state.questions.length-1; renderEditor(); }
 function duplicateQuestion(){ const q=state.questions[state.editorIndex]; if(!q) return; const clone=JSON.parse(JSON.stringify(q)); clone.id=makeNextId(clone.cat); state.questions.splice(state.editorIndex+1,0,clone); state.editorIndex+=1; renderEditor(); }
 function deleteQuestion(){ if(state.questions.length<=1) return toast('最後の1問は削除できません'); state.questions.splice(state.editorIndex,1); state.editorIndex=Math.max(0,state.editorIndex-1); renderEditor(); }
@@ -96,11 +175,12 @@ function downloadCsv(){ const blob=new Blob([questionsToCsv()], {type:'text/csv;
 function importCsvText(text){ try { state.questions = normalizeQuestionsFromCsv(text); state.editorIndex=0; renderEditor(); toast('CSVを読み込みました'); } catch (e) { toast(e.message); } }
 function showTemplate(){ el('csv-area').value = ['id,cat,type,diff,q,ctx,unit,tolerance,accept,choice1,choice2,choice3,choice4,correct,explain,cite','T01,terms,choice,1,PVとは何を指す用語ですか？,,, , ,購入に対するポイント,メインボーナスだけに使うポイント,年間累計ボーナス,登録費用,1,PVは購入に対するポイントです。,概要書面 用語解説','C99,calc,numerical,2,アクティブボーナスを2口取得した場合の金額は？,1口=2400円,円,0,4800,,,,, ,2,400円×2=4,800円です。,概要書面 P17'].join('\n'); }
 document.addEventListener('DOMContentLoaded', async () => {
+  loadGitHubConfig();
   try { await loadCurrentCsv(); } catch (e) { toast(e.message); }
   el('reload-current').addEventListener('click', async () => { try { await loadCurrentCsv(); } catch(e){ toast(e.message); } });
   el('add-choice').addEventListener('click', () => addQuestion('choice')); el('add-numerical').addEventListener('click', () => addQuestion('numerical')); el('duplicate-question').addEventListener('click', duplicateQuestion); el('delete-question').addEventListener('click', deleteQuestion);
-  el('save-question').addEventListener('click', saveQuestion); el('reset-question').addEventListener('click', () => loadQuestion(state.editorIndex)); el('preview-csv').addEventListener('click', showCsv); el('download-csv').addEventListener('click', downloadCsv);
-  el('show-template').addEventListener('click', showTemplate); el('import-csv').addEventListener('click', () => importCsvText(el('csv-area').value)); el('qtype').addEventListener('change', togglePanels);
+  el('save-question').addEventListener('click', () => saveAndPushQuestion().catch(e => toast(e.message))); el('save-question-local').addEventListener('click', saveQuestion); el('reset-question').addEventListener('click', () => loadQuestion(state.editorIndex)); el('preview-csv').addEventListener('click', showCsv); el('download-csv').addEventListener('click', downloadCsv);
+  el('show-template').addEventListener('click', showTemplate); el('import-csv').addEventListener('click', () => importCsvText(el('csv-area').value)); el('qtype').addEventListener('change', togglePanels); el('save-gh-config').addEventListener('click', () => saveGitHubConfig(true)); el('test-gh-config').addEventListener('click', () => testGitHubConfig());
   el('question-list').addEventListener('click', e => { const btn = e.target.closest('.item'); if(!btn) return; loadQuestion(Number(btn.dataset.index)); });
   el('choice-rows').addEventListener('click', e => { const remove = e.target.closest('.remove-option'); if(!remove) return; const rows=document.querySelectorAll('#choice-rows .choice-row'); if(rows.length<=2) return toast('選択肢は2つ以上必要です'); remove.closest('.choice-row').remove(); const radios=[...document.querySelectorAll('#choice-rows input[type="radio"]')]; if(radios.length && !radios.some(r=>r.checked)) radios[0].checked=true; });
   el('add-option').addEventListener('click', () => { const rows=[...document.querySelectorAll('#choice-rows .choice-row')].map(row=>({ v:row.querySelector('.choice-text').value, ok:row.querySelector('input[type="radio"]').checked })); rows.push({v:`選択肢${rows.length+1}`, ok:false}); renderChoiceRows(rows); });
