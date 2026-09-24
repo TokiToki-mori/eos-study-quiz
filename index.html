@@ -45,7 +45,25 @@ h1{font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-weight:700;font-siz
 .q-nav{display:flex;justify-content:space-between;align-items:center;margin-top:20px;font-size:12px;color:var(--ink-2)}
 .loading,.error-panel{background:#fffdf6;border:1px solid var(--line);padding:22px;text-align:center;color:var(--ink-2)}
 .hidden{display:none!important}
-@media(max-width:720px){.category-grid,.score-panel{grid-template-columns:1fr 1fr}.glossary dl{grid-template-columns:1fr}.q-nav{flex-direction:column;gap:10px}.actions{flex-direction:column}.btn{width:100%}.shell{padding:20px 14px 54px}.q-card{padding:20px 16px}.q-text{font-size:17px}.calc{display:grid;grid-template-columns:1fr auto}.calc-input{width:100%}}
+
+/* --- 追加: 完了画面 --- */
+.completion{margin-top:24px;background:#fffdf6;border:1px solid var(--gold);box-shadow:var(--shadow);padding:28px;position:relative;overflow:hidden}
+.completion::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--gold),var(--gold-soft),var(--gold))}
+.comp-eyebrow{font-family:Georgia,serif;letter-spacing:.25em;font-size:11px;color:var(--gold);text-transform:uppercase;margin-bottom:6px}
+.comp-title{font-size:22px;font-weight:700;color:var(--navy);line-height:1.3}
+.comp-stats{display:flex;gap:18px;margin:16px 0 20px;flex-wrap:wrap}
+.comp-stat{background:var(--paper-2);border:1px solid var(--line);padding:12px 16px;min-width:120px;text-align:center}
+.comp-stat .v{font-family:Georgia,serif;font-size:28px;font-weight:700;color:var(--navy)}
+.comp-stat .l{font-size:11px;letter-spacing:.12em;color:var(--ink-2);margin-top:2px}
+.comp-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.comp-other{margin-top:22px;padding-top:18px;border-top:1px dashed var(--line)}
+.comp-other h4{font-size:13px;letter-spacing:.12em;color:var(--ink-2);margin-bottom:10px}
+.other-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.other-btn{padding:14px 12px;background:var(--paper-2);border:1px solid var(--line);cursor:pointer;text-align:left}
+.other-btn:hover{background:#fbf4e2;border-color:var(--gold)}
+.other-btn .on{font-size:14px;font-weight:600;color:var(--navy)}
+.other-btn .od{font-size:11px;color:var(--ink-2);margin-top:3px}
+@media(max-width:720px){.category-grid,.score-panel{grid-template-columns:1fr 1fr}.glossary dl{grid-template-columns:1fr}.q-nav{flex-direction:column;gap:10px}.actions{flex-direction:column}.btn{width:100%}.shell{padding:20px 14px 54px}.q-card{padding:20px 16px}.q-text{font-size:17px}.calc{display:grid;grid-template-columns:1fr auto}.calc-input{width:100%}.other-grid{grid-template-columns:1fr}}
 @media(max-width:420px){.modes{display:grid;grid-template-columns:1fr 1fr}.score-panel,.category-grid{grid-template-columns:1fr}h1{font-size:27px}}
 </style>
 </head>
@@ -100,6 +118,8 @@ h1{font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-weight:700;font-siz
       <span id="q-position">— / —</span>
       <button class="btn ghost" id="btn-next">次の問題 →</button>
     </div>
+    <!-- 追加: 完了画面 -->
+    <div id="completion" class="completion hidden"></div>
   </section>
 </div>
 <script>
@@ -166,10 +186,29 @@ function renderCategories(){
   }).join('');
   grid.querySelectorAll('.cat-card').forEach(btn => btn.addEventListener('click', () => startCategory(btn.dataset.cat)));
 }
-function renderHome(){ el('home').classList.remove('hidden'); el('quiz').classList.add('hidden'); }
+function renderHome(){ 
+  el('home').classList.remove('hidden'); 
+  el('quiz').classList.add('hidden'); 
+  el('completion').classList.add('hidden');
+}
 function renderEmpty(message){ el('quiz').classList.remove('hidden'); el('home').classList.add('hidden'); el('q-card').innerHTML = `<div class="q-text">${message}</div>`; }
-function startCategory(cat){ state.currentList = state.questions.filter(q => q.cat === cat).map(q => q.id); state.currentIdx = 0; state.mode='sequential'; setModeButtons(); renderQuestion(); }
+function startCategory(cat){ 
+  state.currentList = state.questions.filter(q => q.cat === cat).map(q => q.id); 
+  state.currentIdx = 0; 
+  state.mode='sequential'; 
+  setModeButtons(); 
+  el('completion').classList.add('hidden');
+  renderQuestion(); 
+  window.scrollTo({top:0, behavior:'smooth'});
+}
 function getQuestion(){ const id = state.currentList[state.currentIdx]; return state.questions.find(q => q.id === id); }
+function getCurrentCategoryKey(){
+  const q = getQuestion();
+  if(q) return q.cat;
+  // fallback: infer from currentList first item
+  const first = state.questions.find(x => x.id === state.currentList[0]);
+  return first ? first.cat : 'basic';
+}
 function renderResult(q, ans){
   const correctText = q.type === 'choice' ? (q.choices.find(c => c.ok) || {}).v || '—' : q.accept[0];
   const yourText = q.type === 'choice' ? ((ans.choiceIndex ?? -1) >= 0 ? q.choices[ans.choiceIndex].v : '未回答') : (ans.value ?? '未回答');
@@ -191,9 +230,84 @@ function renderQuestion(){
   el('q-card').innerHTML = html;
   if(q.type === 'choice') document.querySelectorAll('.choice').forEach(node => node.addEventListener('click', () => { document.querySelectorAll('.choice').forEach(n => n.classList.remove('selected')); node.classList.add('selected'); }));
   el('btn-submit').onclick = () => submitAnswer(q);
-  el('btn-clear').onclick = () => { delete state.answers[q.id]; state.streak = 0; updateScore(); renderQuestion(); };
-  el('btn-hint').onclick = () => { state.answers[q.id] = { ...(state.answers[q.id] || {}), evaluated:true, hintOnly:true, userAnswered:Boolean((state.answers[q.id]||{}).userAnswered), ok:Boolean((state.answers[q.id]||{}).ok) }; renderQuestion(); };
+  el('btn-clear').onclick = () => { delete state.answers[q.id]; state.streak = 0; updateScore(); renderQuestion(); checkCompletion(); };
+  el('btn-hint').onclick = () => { state.answers[q.id] = { ...(state.answers[q.id] || {}), evaluated:true, hintOnly:true, userAnswered:Boolean((state.answers[q.id]||{}).userAnswered), ok:Boolean((state.answers[q.id]||{}).ok) }; renderQuestion(); checkCompletion(); };
+  
+  // 前へ/次へボタンの活性制御
+  el('btn-prev').disabled = state.currentIdx === 0;
+  el('btn-next').disabled = state.currentIdx >= state.currentList.length - 1;
+  el('btn-prev').style.opacity = el('btn-prev').disabled ? '0.4' : '1';
+  el('btn-next').style.opacity = el('btn-next').disabled ? '0.4' : '1';
+
+  checkCompletion();
 }
+
+function checkCompletion(){
+  const completionEl = el('completion');
+  const isLast = state.currentIdx === state.currentList.length - 1;
+  const q = getQuestion();
+  if(!q) { completionEl.classList.add('hidden'); return; }
+  const ans = state.answers[q.id];
+  // 最終問題を回答済みなら完了画面を出す
+  if(isLast && ans && ans.evaluated && ans.userAnswered){
+    showCompletionScreen();
+  } else {
+    completionEl.classList.add('hidden');
+  }
+}
+
+function showCompletionScreen(){
+  const completionEl = el('completion');
+  const catKey = getCurrentCategoryKey();
+  const cat = CATEGORIES.find(c => c.key === catKey) || {name: catKey};
+  const ids = state.currentList;
+  const doneInCat = ids.filter(id => state.answers[id]?.userAnswered);
+  const correctInCat = ids.filter(id => state.answers[id]?.ok);
+  const rate = doneInCat.length ? Math.round(correctInCat.length / doneInCat.length * 100) : 0;
+  const wrongIds = ids.filter(id => { const a = state.answers[id]; return a?.userAnswered && !a.ok; });
+
+  const otherCats = CATEGORIES.filter(c => c.key !== catKey).map(c => {
+    const count = state.questions.filter(q => q.cat === c.key).length;
+    return `<button class="other-btn" data-cat="${c.key}"><div class="on">${c.name}</div><div class="od">${count}問 · ${c.desc.slice(0,22)}…</div></button>`;
+  }).join('');
+
+  completionEl.innerHTML = `
+    <div class="comp-eyebrow">Complete · ${cat.name}</div>
+    <div class="comp-title">🎉 このカテゴリーを修了しました！</div>
+    <div class="comp-stats">
+      <div class="comp-stat"><div class="v">${doneInCat.length}/${ids.length}</div><div class="l">回答済み</div></div>
+      <div class="comp-stat"><div class="v">${correctInCat.length}</div><div class="l">正解</div></div>
+      <div class="comp-stat"><div class="v">${rate}%</div><div class="l">正答率</div></div>
+    </div>
+    <div class="comp-actions">
+      <button class="btn primary" id="comp-home">最初のページに戻る</button>
+      ${wrongIds.length ? `<button class="btn" id="comp-review">間違えた ${wrongIds.length}問を復習</button>` : ''}
+    </div>
+    <div class="comp-other">
+      <h4>他のカテゴリーへ進む</h4>
+      <div class="other-grid">${otherCats}</div>
+    </div>
+  `;
+  completionEl.classList.remove('hidden');
+  // scroll to completion
+  setTimeout(()=>{ completionEl.scrollIntoView({behavior:'smooth', block:'start'}); }, 200);
+
+  el('comp-home').onclick = () => { renderHome(); window.scrollTo({top:0, behavior:'smooth'}); };
+  const reviewBtn = document.getElementById('comp-review');
+  if(reviewBtn){
+    reviewBtn.onclick = () => {
+      state.currentList = wrongIds;
+      state.currentIdx = 0;
+      completionEl.classList.add('hidden');
+      renderQuestion();
+      window.scrollTo({top:0, behavior:'smooth'});
+    };
+  }
+  completionEl.querySelectorAll('.other-btn').forEach(b=>{
+    b.addEventListener('click', ()=>{ startCategory(b.dataset.cat); });
+  });
+}
+
 function submitAnswer(q){
   let answer = { evaluated:true, hintOnly:false, userAnswered:true };
   if(q.type === 'choice'){
@@ -206,7 +320,17 @@ function submitAnswer(q){
   state.answers[q.id] = answer; state.streak = answer.ok ? state.streak + 1 : 0; updateScore(); renderQuestion();
 }
 function setModeButtons(){ document.querySelectorAll('#modes button[data-mode]').forEach(btn => btn.classList.toggle('active', btn.dataset.mode === state.mode)); }
-function switchMode(mode){ state.mode = mode; setModeButtons(); if(mode === 'browse'){ renderHome(); return; } if(mode === 'sequential'){ if(!state.currentList.length){ state.currentList = state.questions.map(q => q.id); state.currentIdx = 0; } renderQuestion(); return; } if(mode === 'review'){ const wrong = Object.entries(state.answers).filter(([,a]) => a.userAnswered && !a.ok).map(([id]) => id); if(!wrong.length){ alert('誤答がありません。'); renderHome(); return; } state.currentList = wrong; state.currentIdx = 0; renderQuestion(); } }
+function switchMode(mode){ 
+  el('completion').classList.add('hidden');
+  state.mode = mode; setModeButtons(); 
+  if(mode === 'browse'){ renderHome(); return; } 
+  if(mode === 'sequential'){ if(!state.currentList.length){ state.currentList = state.questions.map(q => q.id); state.currentIdx = 0; } renderQuestion(); return; } 
+  if(mode === 'review'){ 
+    const wrong = Object.entries(state.answers).filter(([,a]) => a.userAnswered && !a.ok).map(([id]) => id); 
+    if(!wrong.length){ alert('誤答がありません。素晴らしいです！'); renderHome(); return; } 
+    state.currentList = wrong; state.currentIdx = 0; renderQuestion(); 
+  } 
+}
 document.addEventListener('DOMContentLoaded', async () => {
   try {
     await loadQuestions();
@@ -215,13 +339,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderHome();
     updateScore();
     document.querySelectorAll('#modes button[data-mode]').forEach(btn => btn.addEventListener('click', () => switchMode(btn.dataset.mode)));
-    el('btn-prev').addEventListener('click', () => { if(state.currentIdx > 0){ state.currentIdx--; renderQuestion(); } });
-    el('btn-next').addEventListener('click', () => { if(state.currentIdx < state.currentList.length - 1){ state.currentIdx++; renderQuestion(); } });
+    el('btn-prev').addEventListener('click', () => { if(state.currentIdx > 0){ state.currentIdx--; el('completion').classList.add('hidden'); renderQuestion(); } });
+    el('btn-next').addEventListener('click', () => { if(state.currentIdx < state.currentList.length - 1){ state.currentIdx++; el('completion').classList.add('hidden'); renderQuestion(); } });
   } catch (error) {
     el('loading').classList.add('hidden'); const err = el('error'); err.classList.remove('hidden'); err.innerHTML = `<b>問題データを読み込めませんでした。</b><br>${error.message}<br><br><button class="btn primary" onclick="location.reload()">再読み込み</button>`;
   }
 });
 </script>
-<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925" integrity="sha512-d9sL6GJLXn6fInD1+TVXhTcQOsmxeHfmHAvwGDIxp5TO+uo1fiWW7mHomMj4MLRlCsJDTqXzWLHJFFlPCEIj/A==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79"}' crossorigin="anonymous"></script>
 </body>
 </html>
